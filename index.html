@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PROJECT 90 // FULL RELEASE (PHASE 5)</title>
+  <title>PROJECT 90 // REFACTORED RELEASE</title>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -40,6 +40,7 @@
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      box-sizing: border-box;
     }
     body {
       background-color: #07080c;
@@ -81,12 +82,12 @@
       to { transform: rotate(0deg); }
     }
     @keyframes float-core {
-      0%, 100% { transform: translateY(0px) scale(1); }
-      50% { transform: translateY(-5px) scale(1.02); }
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
     }
     @keyframes shield-pulse {
-      0%, 100% { opacity: 0.75; transform: scale(1); }
-      50% { opacity: 0.95; transform: scale(1.02); }
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 0.98; }
     }
     @keyframes damage-shake {
       0%, 100% { transform: translate(0, 0); }
@@ -95,10 +96,13 @@
       60% { transform: translate(-4px, -2px); }
       80% { transform: translate(4px, 2px); }
     }
-    .animate-spin-slow { animation: spin-slow 18s linear infinite; transform-origin: center; }
-    .animate-spin-reverse { animation: spin-reverse 12s linear infinite; transform-origin: center; }
+    .svg-origin-center {
+      transform-origin: 100px 100px;
+    }
+    .animate-spin-slow { animation: spin-slow 18s linear infinite; }
+    .animate-spin-reverse { animation: spin-reverse 12s linear infinite; }
     .animate-float { animation: float-core 4s ease-in-out infinite; }
-    .animate-shield { animation: shield-pulse 3s ease-in-out infinite; transform-origin: center; }
+    .animate-shield { animation: shield-pulse 3s ease-in-out infinite; }
     .shake-damage { animation: damage-shake 0.45s ease-in-out; }
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: #07080c; }
@@ -123,24 +127,21 @@
         <div class="truncate">
           <div class="flex items-center gap-1.5">
             <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400">PROJECT 90</span>
-            <span id="pro-header-badge" class="hidden px-1.5 py-0.2 rounded bg-cyber-gold text-black font-mono font-black text-[8px] uppercase">PRO</span>
+            <span id="pro-header-badge" class="hidden px-1.5 py-0.2 rounded bg-cyber-gold text-black font-mono font-black text-[8px] uppercase">PRO/МЕС</span>
           </div>
           <div id="user-callsign" class="text-xs font-bold tracking-wider text-white font-mono truncate">OPERATOR_01</div>
         </div>
       </div>
 
       <div class="flex items-center gap-1.5 shrink-0">
-        <!-- Streak Freeze Counter (❄️) -->
         <button onclick="App.switchTab('shop')" title="Крио-заморозка стрика" class="flex items-center gap-1 bg-slate-900/90 border border-cyber-ice/40 px-2 py-1 rounded-lg active:scale-95 transition">
           <i data-lucide="snowflake" class="w-3.5 h-3.5 text-cyber-ice"></i>
           <span id="header-freezes" class="font-mono font-bold text-xs text-cyber-ice">1</span>
         </button>
-        <!-- Coins Balance (⚡) -->
         <button onclick="App.switchTab('shop')" class="flex items-center gap-1 bg-slate-900/90 border border-cyber-gold/40 px-2 py-1 rounded-lg active:scale-95 transition">
           <i data-lucide="zap" class="w-3.5 h-3.5 text-cyber-gold fill-cyber-gold"></i>
           <span id="header-coins" class="font-mono font-bold text-xs text-cyber-gold">0</span>
         </button>
-        <!-- Streak Counter (🔥) -->
         <div class="flex items-center gap-1 bg-slate-900/90 border border-cyber-crimson/40 px-2 py-1 rounded-lg">
           <i data-lucide="flame" class="w-3.5 h-3.5 text-cyber-crimson fill-cyber-crimson"></i>
           <span id="header-streak" class="font-mono font-bold text-xs text-white">0</span>
@@ -154,23 +155,28 @@
       <!-- VIEW 1: HERO / TODAY -->
       <div id="view-hero" class="space-y-4">
         
-        <!-- AVATAR CARD -->
-        <div id="avatar-card-box" class="relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300">
+        <!-- AVATAR CARD (FIXED CENTERED ALIGNMENT) -->
+        <div id="avatar-card-box" class="relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300">
           
-          <div class="absolute top-2.5 left-3 text-[10px] font-mono text-cyber-cyan/70 leading-tight">
-            СТАДИЯ: <span id="avatar-stage-title" class="text-white font-bold">СПЯЩИЙ</span><br>
-            ДЕНЬ: <span id="current-day-label" class="text-cyber-cyan font-bold">1</span>/90
-          </div>
+          <!-- Top HUD Row (Flex-between, no overlap) -->
+          <div class="w-full flex items-start justify-between gap-2 z-10">
+            <div class="text-[10px] font-mono text-cyber-cyan/80 leading-tight">
+              <div>СТАДИЯ: <span id="avatar-stage-title" class="text-white font-bold">СПЯЩИЙ</span></div>
+              <div class="mt-0.5">ДЕНЬ: <span id="current-day-label" class="text-cyber-cyan font-bold">1</span>/90</div>
+            </div>
 
-          <div class="absolute top-2.5 right-3 text-right text-[10px] font-mono leading-tight">
-            <div>УРОВЕНЬ <span id="avatar-level" class="text-cyber-gold font-bold">1</span></div>
-            <div id="shield-badge" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 text-[9px] font-bold mt-0.5">
-              <span>🛡 ЩИТ АКТИВЕН</span>
+            <div class="text-right text-[10px] font-mono leading-tight shrink-0">
+              <div>УРОВЕНЬ <span id="avatar-level" class="text-cyber-gold font-bold">1</span></div>
+              <div id="shield-badge" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 text-[9px] font-bold mt-0.5">
+                <span>🛡 ЩИТ АКТИВЕН</span>
+              </div>
             </div>
           </div>
 
-          <!-- Dynamic SVG Avatar + Equipped Skins/Wings/Auras + Energy Shield -->
-          <div id="avatar-container" class="my-3 animate-float relative flex items-center justify-center w-48 h-48"></div>
+          <!-- Centered Dynamic SVG Avatar -->
+          <div class="my-2 flex items-center justify-center w-full">
+            <div id="avatar-container" class="animate-float flex items-center justify-center w-44 h-44 mx-auto"></div>
+          </div>
 
           <button id="btn-repair-shield" onclick="App.repairShield()" class="hidden mb-2 px-3 py-1 rounded-lg bg-cyber-crimson/20 border border-cyber-crimson text-[10px] font-mono font-bold text-cyber-crimson hover:bg-cyber-crimson hover:text-white transition">
             ⚡ ВОССТАНОВИТЬ ЭНЕРГО-ЩИТ (30⚡)
@@ -200,21 +206,21 @@
           </div>
         </div>
 
-        <!-- HABITS LIST FOR TODAY -->
+        <!-- HABITS LIST FOR TODAY (CLEAN BY DEFAULT + LIMIT GUARD) -->
         <div>
-          <div class="flex items-center justify-between mb-2.5">
-            <div>
+          <div class="flex items-center justify-between mb-2.5 gap-2">
+            <div class="min-w-0">
               <h2 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-                <i data-lucide="check-square" class="w-4 h-4 text-cyber-cyan"></i>
-                Привычки на сегодня
+                <i data-lucide="check-square" class="w-4 h-4 text-cyber-cyan shrink-0"></i>
+                <span class="truncate">Привычки на сегодня</span>
               </h2>
-              <div id="habits-limit-hint" class="text-[10px] font-mono text-slate-500">Лимит базы: 4/4 (PRO — безлимит)</div>
+              <div id="habits-limit-hint" class="text-[10px] font-mono text-slate-500">Добавлено: 0/4 (PRO — безлимит)</div>
             </div>
-            <div class="flex items-center gap-2">
-              <span id="habits-counter" class="text-[11px] font-mono text-cyber-cyan font-bold">0/4</span>
-              <button onclick="App.openHabitModal()" class="px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="habits-counter" class="text-[11px] font-mono text-cyber-cyan font-bold">0/0</span>
+              <button id="btn-open-catalog" onclick="App.openHabitModal()" class="px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
                 <i data-lucide="sparkles" class="w-3 h-3"></i>
-                <span>+ КАТАЛОГ ИДЕЙ</span>
+                <span id="btn-open-catalog-text">+ КАТАЛОГ ИДЕЙ</span>
               </button>
             </div>
           </div>
@@ -232,29 +238,29 @@
         </div>
       </div>
 
-      <!-- VIEW 2: ANTI-HABITS -->
+      <!-- VIEW 2: ANTI-HABITS (EMPTY BY DEFAULT) -->
       <div id="view-antihabits" class="hidden space-y-4">
         <div id="antihabit-shield-banner" class="bg-cyber-card neon-border-cyan rounded-2xl p-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
-            <div id="ah-shield-icon" class="w-10 h-10 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan/40 flex items-center justify-center text-cyber-cyan">
+            <div id="ah-shield-icon" class="w-10 h-10 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan/40 flex items-center justify-center text-cyber-cyan shrink-0">
               <i data-lucide="shield" class="w-5 h-5"></i>
             </div>
             <div>
               <div id="ah-shield-title" class="text-xs font-mono font-bold text-white uppercase">Энергетический щит цел</div>
-              <div id="ah-shield-desc" class="text-[11px] text-slate-400">Таймеры идут без срывов — Аватар под защитой</div>
+              <div id="ah-shield-desc" class="text-[11px] text-slate-400">Добавь таймер отказа, чтобы активировать защиту от соблазнов</div>
             </div>
           </div>
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-1.5">
-            <span class="text-[10px] font-mono uppercase text-slate-400">Добавление таймера отказа</span>
-            <span id="antihabits-limit-hint" class="text-[10px] font-mono text-slate-500">База: до 2 таймеров</span>
+            <span class="text-[10px] font-mono uppercase text-slate-400">Новый таймер отказа (Счётчик дней БЕЗ)</span>
+            <span id="antihabits-limit-hint" class="text-[10px] font-mono text-slate-500">База: 0/2 таймеров</span>
           </div>
           <div class="flex gap-2">
-            <input id="new-antihabit-input" type="text" maxlength="36" placeholder="+ Новый таймер (напр. Без никотина)..." 
+            <input id="new-antihabit-input" type="text" maxlength="36" placeholder="Напр.: Без сахара / Без курения / Без фастфуда..." 
               class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-crimson font-mono" />
-            <button onclick="App.addAntiHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition">
+            <button id="btn-add-antihabit" onclick="App.addAntiHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition shrink-0">
               СТАРТ
             </button>
           </div>
@@ -263,57 +269,100 @@
         <div id="antihabits-list" class="space-y-3"></div>
       </div>
 
-      <!-- VIEW 3: CLAN (CO-OP & SQUAD LEADERBOARD) -->
+      <!-- VIEW 3: CLAN (NO FAKE USERS + 200 STARS CLAN CREATION) -->
       <div id="view-clan" class="hidden space-y-4">
-        <div class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2.5">
-              <div class="w-10 h-10 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 flex items-center justify-center text-cyber-purple">
-                <i data-lucide="users" class="w-5 h-5"></i>
-              </div>
-              <div>
-                <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-purple">WINTER ARC SQUAD // P2P CO-OP</div>
-                <h2 class="text-sm font-mono font-black text-white uppercase">ЛИДЕРБОРД КЛАНА</h2>
-              </div>
-            </div>
-            <div class="text-right font-mono">
-              <div class="text-[10px] text-slate-400">ОБЩИЙ СТРИК</div>
-              <div id="clan-total-streak" class="text-sm font-black text-cyber-gold">0 🔥</div>
-            </div>
+        
+        <!-- STATE A: NO CLAN YET (Empty State with Create for 200⭐ or Join via Ref) -->
+        <div id="clan-empty-view" class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-5 text-center space-y-4">
+          <div class="w-14 h-14 rounded-2xl bg-cyber-purple/15 border border-cyber-purple/40 mx-auto flex items-center justify-center text-cyber-purple">
+            <i data-lucide="shield" class="w-7 h-7"></i>
           </div>
 
-          <button onclick="App.shareClanInvite()" 
-            class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-purple via-fuchsia-600 to-cyber-cyan text-white font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
-            <i data-lucide="share-2" class="w-4 h-4"></i>
-            <span>ПРИГЛАСИТЬ В КЛАН / ПОДЕЛИТЬСЯ ФОРМОЙ</span>
-          </button>
+          <div>
+            <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-purple mb-1">P2P КООПЕРАТИВНЫЙ ПРОТОКОЛ</div>
+            <h2 class="text-base font-mono font-black text-white uppercase">ТЫ НЕ СОСТОИШЬ В КЛАНЕ</h2>
+            <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+              Создай собственный боевой Клан, чтобы приглашать друзей по реферальной ссылке, отслеживать их форму и пинать тех, кто спит.
+            </p>
+          </div>
 
-          <div class="pt-1 flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400">
-            <button onclick="App.copyMyRefCode()" class="flex items-center gap-1 text-cyber-cyan hover:underline">
-              <i data-lucide="copy" class="w-3 h-3"></i>
-              <span>Скопировать мой ref-код</span>
-            </button>
-            <button onclick="App.toggleManualSyncBox()" class="text-slate-400 hover:text-white">
-              Ввести код друга вручную ▾
+          <!-- Create Clan Input & 200 Stars One-Time Purchase -->
+          <div class="bg-slate-900/90 border border-cyber-border rounded-xl p-3.5 text-left space-y-2.5">
+            <div class="text-[10px] font-mono text-cyber-gold uppercase font-bold">Создание своего Клана (Разовая покупка):</div>
+            <input id="create-clan-name-input" type="text" maxlength="22" placeholder="Название клана (напр. WINTER TITANS)..." 
+              class="w-full bg-cyber-card border border-cyber-border rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-gold font-mono" />
+            <button onclick="App.buyWithTelegramStars('create_clan')" 
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-gold/20 flex items-center justify-center gap-1.5 active:scale-98 transition">
+              <span>⭐ СОЗДАТЬ КЛАН ЗА 200 STARS (РАЗОВО)</span>
             </button>
           </div>
 
-          <div id="manual-sync-box" class="hidden pt-2 border-t border-cyber-border/80 flex gap-2">
-            <input id="manual-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
-              class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
-            <button onclick="App.importManualRef()" class="px-3 py-2 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 text-cyber-purple font-mono text-[11px] font-bold active:scale-95">
-              СИНХР.
-            </button>
+          <!-- Join Friend's Clan for Free via Ref Code -->
+          <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 text-left space-y-2">
+            <div class="text-[10px] font-mono text-slate-400 uppercase">У друга уже есть клан? Вступи по его коду бесплатно:</div>
+            <div class="flex gap-2">
+              <input id="join-clan-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
+                class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
+              <button onclick="App.joinClanByRefInput()" class="px-3.5 py-2 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 text-cyber-purple font-mono text-[11px] font-bold active:scale-95 shrink-0">
+                ВСТУПИТЬ
+              </button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Рейтинг выживших операторов</span>
-            <span id="clan-awake-counter" class="text-[11px] font-mono text-cyber-emerald font-bold">0 В СТРОЮ</span>
+        <!-- STATE B: ACTIVE CLAN LEADERBOARD -->
+        <div id="clan-active-view" class="hidden space-y-4">
+          <div class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 flex items-center justify-center text-cyber-purple shrink-0">
+                  <i data-lucide="users" class="w-5 h-5"></i>
+                </div>
+                <div class="min-w-0">
+                  <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-purple">КЛАН АКТИВЕН // P2P CO-OP</div>
+                  <h2 id="active-clan-title" class="text-sm font-mono font-black text-white uppercase truncate">WINTER SQUAD</h2>
+                </div>
+              </div>
+              <div class="text-right font-mono shrink-0">
+                <div class="text-[10px] text-slate-400">ОБЩИЙ СТРИК</div>
+                <div id="clan-total-streak" class="text-sm font-black text-cyber-gold">0 🔥</div>
+              </div>
+            </div>
+
+            <button onclick="App.shareClanInvite()" 
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-purple via-fuchsia-600 to-cyber-cyan text-white font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
+              <i data-lucide="share-2" class="w-4 h-4"></i>
+              <span>ПРИГЛАСИТЬ В КЛАН / ПОДЕЛИТЬСЯ ФОРМОЙ</span>
+            </button>
+
+            <div class="pt-1 flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400">
+              <button onclick="App.copyMyRefCode()" class="flex items-center gap-1 text-cyber-cyan hover:underline">
+                <i data-lucide="copy" class="w-3 h-3"></i>
+                <span>Скопировать мой ref-код</span>
+              </button>
+              <button onclick="App.toggleManualSyncBox()" class="text-slate-400 hover:text-white">
+                 + Добавить друга по коду ▾
+              </button>
+            </div>
+
+            <div id="manual-sync-box" class="hidden pt-2 border-t border-cyber-border/80 flex gap-2">
+              <input id="manual-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
+                class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
+              <button onclick="App.importManualRef()" class="px-3 py-2 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 text-cyber-purple font-mono text-[11px] font-bold active:scale-95">
+                ДОБАВИТЬ
+              </button>
+            </div>
           </div>
-          <div id="clan-leaderboard" class="space-y-2.5"></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Лидерборд участников</span>
+              <span id="clan-awake-counter" class="text-[11px] font-mono text-cyber-emerald font-bold">1/1 ВЫПОЛНИЛИ</span>
+            </div>
+            <div id="clan-leaderboard" class="space-y-2.5"></div>
+          </div>
         </div>
+
       </div>
 
       <!-- VIEW 4: STATS (90-DAY HEATMAP, RECORD CARDS & VIRAL STORY GENERATOR) -->
@@ -342,7 +391,7 @@
               <span>ДИСЦИПЛИНА</span>
               <i data-lucide="activity" class="w-3.5 h-3.5 text-cyber-emerald"></i>
             </div>
-            <div id="stat-card-discipline" class="text-xl font-black text-cyber-emerald">100%</div>
+            <div id="stat-card-discipline" class="text-xl font-black text-cyber-emerald">0%</div>
             <div id="stat-card-discipline-sub" class="text-[9px] text-slate-400 mt-0.5">Индекс стабильности</div>
           </div>
 
@@ -385,7 +434,7 @@
             </div>
             <h3 class="text-xs font-mono font-black text-white uppercase tracking-wider">КАРТОЧКА ГЕРОЯ ДЛЯ STORIES / TIKTOK</h3>
             <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-              Рендерит твой Аватар со всеми надетыми скинами, крыльями и матрицей 90 дней.
+              Рендерит твой Аватар со всеми надетыми скинами, крыльями и матрицей 90 дней без наложения шрифтов.
             </p>
           </div>
 
@@ -397,14 +446,14 @@
         </div>
       </div>
 
-      <!-- VIEW 5: SHOP & FREEMIUM MONETIZATION (PHASE 5) -->
+      <!-- VIEW 5: SHOP WITH LIVE TRY-ON PREVIEW & MONTHLY PRO SUBSCRIPTION -->
       <div id="view-shop" class="hidden space-y-4">
         
         <!-- Top Balance Bar -->
         <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 flex items-center justify-between">
           <div>
-            <div class="text-[10px] font-mono uppercase text-slate-400">Черный рынок кибер-имплантов</div>
-            <div class="text-xs font-mono font-bold text-white">ТВОЙ БАЛАНС АКТИВОВ</div>
+            <div class="text-[10px] font-mono uppercase text-slate-400">Примерочная и Арсенал</div>
+            <div class="text-xs font-mono font-bold text-white">БАЛАНС ДИСЦИПЛИНЫ</div>
           </div>
           <div class="flex items-center gap-2 font-mono">
             <div class="flex items-center gap-1 bg-slate-900 border border-cyber-ice/40 px-2.5 py-1 rounded-xl text-xs text-cyber-ice font-bold">
@@ -418,56 +467,87 @@
           </div>
         </div>
 
-        <!-- 1. TITAN PRO BANNER (TELEGRAM STARS FLAGSHIP) -->
+        <!-- LIVE AVATAR TRY-ON STAGE IN SHOP -->
+        <div class="bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan rounded-2xl p-4 flex flex-col items-center justify-center relative">
+          <div class="w-full flex items-center justify-between text-[10px] font-mono mb-1">
+            <span class="text-cyber-cyan uppercase">ГОЛОГРАММА ПРЕДПРОСМОТРА</span>
+            <span id="shop-preview-status" class="text-slate-400">ТЕКУЩАЯ ЭКИПИРОВКА</span>
+          </div>
+
+          <!-- Centered Shop Avatar Preview -->
+          <div id="shop-avatar-preview-box" class="w-36 h-36 flex items-center justify-center mx-auto my-1"></div>
+
+          <!-- Action Bar when previewing an unowned item -->
+          <div id="shop-preview-action-bar" class="hidden w-full pt-2.5 mt-2 border-t border-cyber-border flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-[10px] font-mono text-cyber-gold uppercase">Примерка скина:</div>
+              <div id="shop-preview-item-name" class="text-xs font-mono font-bold text-white truncate">Скин</div>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="App.clearShopPreview()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 text-slate-300 font-mono text-[10px] font-bold">
+                СБРОСИТЬ
+              </button>
+              <button id="shop-preview-buy-btn" class="px-3 py-1.5 rounded-lg bg-cyber-gold text-black font-mono text-[10px] font-black uppercase active:scale-95">
+                КУПИТЬ
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 1. TITAN PRO MONTHLY SUBSCRIPTION -->
         <div id="pro-shop-card" class="relative rounded-2xl bg-gradient-to-br from-[#1f1605] via-[#120d1d] to-[#090d16] neon-border-gold p-4 space-y-3 overflow-hidden">
           <div class="flex items-start justify-between gap-2">
             <div>
               <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold text-black font-mono text-[9px] font-black uppercase mb-1">
-                <span>⭐ TELEGRAM STARS EXCLUSIVE</span>
+                <span>⭐ ЕЖЕМЕСЯЧНАЯ ПОДПИСКА</span>
               </div>
-              <h2 class="text-base font-mono font-black text-white uppercase tracking-wide">СТАТУС «ТИТАН PRO»</h2>
-              <p class="text-[11px] text-slate-300 mt-0.5">Полная разблокировка потенциала системы PROJECT 90 навсегда.</p>
+              <h2 class="text-base font-mono font-black text-white uppercase tracking-wide">ПОДПИСКА «ТИТАН PRO»</h2>
+              <p class="text-[11px] text-slate-300 mt-0.5">Снимает лимиты и открывает эксклюзивную экипировку на 30 дней.</p>
             </div>
           </div>
 
           <ul class="space-y-1.5 text-[11px] font-mono text-slate-200">
-            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Безлимит на привычки и таймеры отказа (снятие лимита 4/2)</span></li>
-            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Эксклюзивные <b>Неоновые Крылья</b> и золотой бейдж <b>[PRO]</b></span></li>
-            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span><b>+2 Крио-заморозки стрика ❄️</b> в подарок сразу</span></li>
-            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Удвоенный фарм монет за закрытие дня (<b>+60⚡</b> вместо +30⚡)</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Безлимит на привычки и анти-привычки (снятие лимита 4/2)</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Эксклюзивные <b>Неоновые Крылья</b> + бейдж <b>[PRO/МЕС]</b></span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span><b>+2 Крио-заморозки стрика ❄️</b> каждый месяц</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Удвоенный бонус за закрытие дня (<b>+60⚡</b> вместо +30⚡)</span></li>
           </ul>
 
           <div id="pro-buy-actions" class="pt-1">
-            <button onclick="App.buyWithTelegramStars('titan_pro')" 
+            <button onclick="App.buyWithTelegramStars('titan_pro_monthly')" 
               class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-gold/25 flex items-center justify-center gap-1.5 active:scale-98 transition">
-              <span>⭐ АКТИВИРОВАТЬ ТИТАН PRO // 150 STARS</span>
+              <span>⭐ ОФОРМИТЬ ТИТАН PRO // 150 STARS В МЕСЯЦ</span>
             </button>
           </div>
         </div>
 
-        <!-- 2. STREAK FREEZE MODULE (КРИО-ЗАМОРОЗКА СТРИКА) -->
-        <div class="bg-cyber-card border border-cyber-ice/40 rounded-2xl p-4 space-y-3">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl bg-cyber-ice/15 border border-cyber-ice/40 flex items-center justify-center text-cyber-ice shrink-0">
-                <i data-lucide="snowflake" class="w-6 h-6"></i>
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-xs font-mono font-black text-white uppercase">ЗАМОРОЗКА СТРИКА</h3>
-                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyber-ice/20 text-cyber-ice font-bold">В запасе: <span id="freeze-stock-badge">1</span>/5</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                  Автоматически спасает серию дней и Аватара от отката, если пропустил день.
-                </p>
-              </div>
-            </div>
+        <!-- 2.AVATAR COSMETICS (CLICK TO PREVIEW / BUY) -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyber-cyan"></i>
+              Скины и Ауры (Нажми для примерки)
+            </h3>
           </div>
 
-          <!-- Free Streak Milestone Progress -->
-          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-[10px] font-mono">
-            <span class="text-slate-400">🎁 Бесплатная заморозка каждые 7 дней стрика:</span>
-            <span id="freeze-milestone-text" class="text-cyber-ice font-bold">0 / 7 ДН.</span>
+          <div id="shop-cosmetics-list" class="space-y-2.5"></div>
+        </div>
+
+        <!-- 3. STREAK FREEZE MODULE -->
+        <div class="bg-cyber-card border border-cyber-ice/40 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-xl bg-cyber-ice/15 border border-cyber-ice/40 flex items-center justify-center text-cyber-ice shrink-0">
+              <i data-lucide="snowflake" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-xs font-mono font-black text-white uppercase">ЗАМОРОЗКА СТРИКА</h3>
+                <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyber-ice/20 text-cyber-ice font-bold">Запас: <span id="freeze-stock-badge">1</span>/5</span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                1 заморозка дается бесплатно за каждые 7 дней стрика.
+              </p>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-2">
@@ -480,32 +560,6 @@
               КУПИТЬ ЗА 25 ⭐
             </button>
           </div>
-        </div>
-
-        <!-- 3. AVATAR COSMETICS (SKINS, AURAS, WINGS, PROGRESS BARS) -->
-        <div>
-          <div class="flex items-center justify-between mb-2.5">
-            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <i data-lucide="sparkles" class="w-4 h-4 text-cyber-cyan"></i>
-              Кастомизация Аватара и Скины
-            </h3>
-            <span class="text-[10px] font-mono text-slate-400">Надевается в 1 клик</span>
-          </div>
-
-          <div id="shop-cosmetics-list" class="space-y-2.5">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-
-        <!-- 4. UTILITY: EMERGENCY SHIELD CALIBRATION -->
-        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 flex items-center justify-between">
-          <div>
-            <div class="text-xs font-mono font-bold text-white">Экстренная калибровка щита</div>
-            <div class="text-[10px] font-mono text-slate-400">Мгновенно убирает трещины после срыва // 30 ⚡</div>
-          </div>
-          <button onclick="App.repairShield()" class="px-3.5 py-2 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-xs font-bold active:scale-95">
-            ЧИНИТЬ (30⚡)
-          </button>
         </div>
 
       </div>
@@ -546,7 +600,7 @@
       <div class="flex items-center justify-between pb-3 border-b border-cyber-border">
         <div class="flex items-center gap-2">
           <i data-lucide="cpu" class="w-4 h-4 text-cyber-cyan"></i>
-          <h3 class="text-sm font-mono font-bold text-white uppercase tracking-wider">Генератор привычек</h3>
+          <h3 class="text-sm font-mono font-bold text-white uppercase tracking-wider">Каталог идей привычек</h3>
         </div>
         <button onclick="App.closeHabitModal()" class="text-slate-400 hover:text-white font-mono text-sm px-2 py-0.5">✕</button>
       </div>
@@ -566,11 +620,14 @@
       <div id="catalog-presets-list" class="space-y-2 overflow-y-auto pr-1 flex-1 my-1"></div>
 
       <div class="pt-3 mt-2 border-t border-cyber-border">
-        <div class="text-[10px] font-mono text-slate-400 uppercase mb-1.5">Или создай свой протокол (+10⚡):</div>
+        <div class="flex items-center justify-between mb-1.5">
+          <span class="text-[10px] font-mono text-slate-400 uppercase">Или создай свой протокол (+10⚡):</span>
+          <span id="modal-limit-badge" class="text-[10px] font-mono text-cyber-cyan">0 / 4</span>
+        </div>
         <div class="flex gap-2">
           <input id="custom-habit-input" type="text" maxlength="45" placeholder="Напр. Растяжка 15 минут..." 
             class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-cyan font-mono" />
-          <button onclick="App.addCustomHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-cyan text-black font-mono text-xs font-black active:scale-95 transition">
+          <button id="btn-modal-custom-add" onclick="App.addCustomHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-cyan text-black font-mono text-xs font-black active:scale-95 transition">
             ДОБАВИТЬ
           </button>
         </div>
@@ -578,16 +635,19 @@
     </div>
   </div>
 
-  <!-- MODAL 2: VIRAL HERO CARD PREVIEW -->
+  <!-- MODAL 2: VIRAL HERO CARD PREVIEW (FIXED HEADER LAYOUT) -->
   <div id="viral-card-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-cyber-card neon-border-cyan rounded-2xl p-4 flex flex-col items-center shadow-2xl max-h-[92vh]">
-      <div class="w-full flex items-center justify-between pb-2.5 mb-2 border-b border-cyber-border">
-        <span class="text-xs font-mono font-bold text-cyber-cyan uppercase tracking-wider">КАРТОЧКА ГЕРОЯ // STORIES 9:16</span>
-        <button onclick="App.closeViralModal()" class="text-slate-400 hover:text-white font-mono text-sm px-2">✕</button>
+      <div class="w-full flex items-start justify-between gap-2 pb-2.5 mb-2 border-b border-cyber-border">
+        <div class="flex flex-col">
+          <span class="text-[10px] font-mono text-slate-400 uppercase">PROJECT 90 // WINTER ARC</span>
+          <span class="text-xs font-mono font-bold text-cyber-cyan uppercase tracking-wider">КАРТОЧКА ГЕРОЯ // STORIES</span>
+        </div>
+        <button onclick="App.closeViralModal()" class="text-slate-400 hover:text-white font-mono text-sm px-2 py-0.5 shrink-0">✕</button>
       </div>
 
       <div class="w-full flex-1 overflow-hidden flex items-center justify-center my-1">
-        <img id="viral-card-preview" alt="PROJECT 90 Hero Card" class="max-h-[60vh] w-auto rounded-xl border border-cyber-border shadow-xl object-contain" />
+        <img id="viral-card-preview" alt="PROJECT 90 Hero Card" class="max-h-[58vh] w-auto rounded-xl border border-cyber-border shadow-xl object-contain" />
       </div>
 
       <p class="text-[10px] font-mono text-slate-400 text-center my-2">
@@ -609,19 +669,19 @@
     </div>
   </div>
 
-  <!-- MODAL 3: TELEGRAM STARS INVOICE SIMULATOR / GATEWAY -->
+  <!-- MODAL 3: TELEGRAM STARS INVOICE GATEWAY -->
   <div id="stars-invoice-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-xs bg-[#131722] neon-border-gold rounded-2xl p-5 text-center space-y-3 shadow-2xl">
       <div class="w-12 h-12 rounded-2xl bg-cyber-gold/20 border border-cyber-gold mx-auto flex items-center justify-center text-2xl">
         ⭐
       </div>
-      <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-gold">TELEGRAM STARS INVOICE</div>
+      <div id="stars-modal-type" class="text-[10px] font-mono uppercase tracking-widest text-cyber-gold">TELEGRAM STARS INVOICE</div>
       <h3 id="stars-modal-title" class="text-sm font-mono font-black text-white uppercase">ТИТАН PRO</h3>
       <p id="stars-modal-desc" class="text-xs text-slate-400 leading-relaxed">
-        В продакшене здесь вызывается нативное окно <code class="text-cyber-cyan">Telegram.WebApp.openInvoice()</code>.
+        Подтверждение транзакции через платежный шлюз Telegram Stars.
       </p>
       <div class="py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-cyber-gold font-bold">
-        К ОПЛАТЕ: <span id="stars-modal-price">150</span> ⭐ STARS
+        К ОПЛАТЕ: <span id="stars-modal-price">150 ⭐</span>
       </div>
       <div class="grid grid-cols-2 gap-2 pt-1">
         <button onclick="App.closeStarsModal()" class="py-2.5 rounded-xl bg-slate-800 text-slate-300 font-mono text-xs font-bold">
@@ -635,18 +695,18 @@
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
+  <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2 w-max max-w-[92vw]">
     <div class="bg-cyber-card neon-border-cyan px-4 py-2 rounded-xl font-mono text-xs text-white flex items-center gap-2 shadow-2xl">
-      <span class="w-2 h-2 rounded-full bg-cyber-cyan animate-ping"></span>
-      <span id="toast-text">SYSTEM UPDATED</span>
+      <span class="w-2 h-2 rounded-full bg-cyber-cyan animate-ping shrink-0"></span>
+      <span id="toast-text" class="truncate">SYSTEM UPDATED</span>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY = 'PROJECT_90_PHASE5_STATE';
+    // New clean storage key so old mock data doesn't pollute first run
+    const STORAGE_KEY = 'PROJECT_90_CLEAN_V2';
     const tg = window.Telegram?.WebApp;
 
-    // Shop Cosmetics Catalog (Coins ⚡, Streak Unlocks 🔥, or Telegram Stars ⭐)
     const SHOP_COSMETICS = [
       {
         id: 'aura_samurai',
@@ -662,16 +722,15 @@
         slot: 'skin',
         title: 'Скин Призрака (Ghost Protocol)',
         desc: 'Фантомный стелс-корпус и неоново-изумрудный визор.',
-        type: 'streak',
-        reqStreak: 5,
-        costCoins: 200,
-        badge: 'СТРИК 5🔥 ИЛИ 200 ⚡'
+        type: 'coins',
+        costCoins: 180,
+        badge: '180 ⚡'
       },
       {
         id: 'wings_neon',
         slot: 'wings',
         title: 'Неоновые крылья Валькирии',
-        desc: 'Энергетические крылья за спиной Аватара (доступно в PRO или за Stars).',
+        desc: 'Энергетические крылья за спиной Аватара (PRO или Stars).',
         type: 'stars',
         costStars: 75,
         badge: '75 ⭐ STARS'
@@ -680,7 +739,7 @@
         id: 'bar_cyber_gold',
         slot: 'progressbar',
         title: 'Кислотно-золотой Прогресс-бар',
-        desc: 'Кастомный неоновый градиент для шкалы дня и фазы эволюции.',
+        desc: 'Кастомный неоновый градиент для шкалы дня и фазы.',
         type: 'coins',
         costCoins: 90,
         badge: '90 ⚡'
@@ -731,10 +790,18 @@
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(587.33, now);
             osc.frequency.setValueAtTime(880, now + 0.07);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.22);
+            gain.gain.setValueAtTime(0.11, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
             osc.start(now);
-            osc.stop(now + 0.22);
+            osc.stop(now + 0.2);
+          } else if (type === 'uncheck') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(420, now);
+            osc.frequency.setValueAtTime(260, now + 0.08);
+            gain.gain.setValueAtTime(0.08, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.16);
+            osc.start(now);
+            osc.stop(now + 0.16);
           } else if (type === 'crack') {
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(160, now);
@@ -747,7 +814,7 @@
             osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
             osc.frequency.exponentialRampToValueAtTime(987.77, now + 0.28);
-            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.setValueAtTime(0.14, now);
             gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
             osc.start(now);
             osc.stop(now + 0.3);
@@ -765,18 +832,23 @@
       }
     };
 
-    const nowMs = Date.now();
+    // CLEAN INITIAL STATE: Empty habits [], empty antihabits [], no fake clan members
     const DEFAULT_STATE = {
       callsign: 'OPERATOR_01',
       isPro: false,
+      proExpiresAt: null,
+      hasClan: false,
+      clanName: '',
       day: 1,
       streak: 0,
       bestStreak: 0,
       streakFreezes: 1,
       lastFreezeRewardStreak: 0,
       completedDays: [],
-      coins: 130,
-      totalCoinsEarned: 130,
+      // Strict accounting for coins to prevent infinite toggle exploit:
+      lockedCoins: 0,      // Coins permanently earned from locked days
+      spentCoins: 0,       // Coins spent in shop
+      coins: 0,            // Current available balance
       totalSlips: 0,
       shieldCracked: false,
       lastSlipTime: null,
@@ -789,21 +861,9 @@
         skin: null,
         progressbar: null
       },
-      habits: [
-        { id: 'h1', title: 'Силовая тренировка / Зарядка', done: false, category: 'СИЛА' },
-        { id: 'h2', title: 'Фокус без телефона (90 минут)', done: false, category: 'РАЗУМ' },
-        { id: 'h3', title: 'Чтение книги (20+ страниц)', done: false, category: 'РАЗУМ' },
-        { id: 'h4', title: 'Подъем по будильнику + Вода', done: false, category: 'РЕЖИМ' }
-      ],
-      antihabits: [
-        { id: 'ah_smoke', title: 'Без курения и никотина', startTime: nowMs - 3 * 86400000 - 14400000, bestSeconds: 3 * 86400 + 14400, slips: 0 },
-        { id: 'ah_sugar', title: 'Без рафинированного сахара', startTime: nowMs - 5 * 86400000 - 3600000, bestSeconds: 5 * 86400 + 3600, slips: 0 }
-      ],
-      clanMembers: [
-        { id: 'peer_vanguard', name: 'KIRA_NEXUS', day: 34, streak: 19, doneToday: true },
-        { id: 'peer_monk', name: 'GHOST_77', day: 64, streak: 42, doneToday: true },
-        { id: 'peer_sleeper', name: 'DEN_ZERO', day: 9, streak: 2, doneToday: false }
-      ]
+      habits: [],
+      antihabits: [],
+      clanMembers: []
     };
 
     const App = {
@@ -811,6 +871,8 @@
       currentCatalogCat: 'str',
       liveTimerInterval: null,
       lastGeneratedCardDataUrl: null,
+      // Temporary preview state for Shop Try-On
+      previewItemId: null,
 
       async init() {
         if (tg) {
@@ -827,11 +889,16 @@
         }
         document.getElementById('user-callsign').textContent = this.state.callsign;
 
+        if (!Array.isArray(this.state.habits)) this.state.habits = [];
+        if (!Array.isArray(this.state.antihabits)) this.state.antihabits = [];
+        if (!Array.isArray(this.state.clanMembers)) this.state.clanMembers = [];
         if (!Array.isArray(this.state.ownedItems)) this.state.ownedItems = [];
         if (!this.state.equipped) this.state.equipped = { aura: null, wings: null, skin: null, progressbar: null };
-        if (typeof this.state.streakFreezes !== 'number') this.state.streakFreezes = 1;
+        if (typeof this.state.lockedCoins !== 'number') this.state.lockedCoins = 0;
+        if (typeof this.state.spentCoins !== 'number') this.state.spentCoins = 0;
 
         this.checkRollover();
+        this.recalculateCoins();
         this.checkIncomingReferral();
         this.renderAll();
         this.startLiveTimers();
@@ -857,39 +924,45 @@
         return { stage: 1, title: 'СПЯЩИЙ', primary: '#64748b', secondary: '#1e293b' };
       },
 
-      getDisciplineScore() {
-        const totalHabits = this.state.habits.length || 1;
-        const doneHabits = this.state.habits.filter(h => h.done).length;
-        const todayRatio = doneHabits / totalHabits;
-        const shieldBonus = this.state.shieldCracked ? 0 : 25;
-        const streakBonus = Math.min(25, (this.state.streak || 0) * 3);
-        return Math.max(10, Math.min(100, Math.round((todayRatio * 50) + shieldBonus + streakBonus)));
+      // FIX #5: Strict deterministic coin balance calculation based on active habits
+      recalculateCoins() {
+        const activeCheckedCoins = this.state.habits.filter(h => h.done).length * 10;
+        const totalEarned = (this.state.lockedCoins || 0) + activeCheckedCoins;
+        this.state.coins = Math.max(0, totalEarned - (this.state.spentCoins || 0));
       },
 
-      // Check daily rollover + Duolingo-style Streak Freeze Protection
+      getDisciplineScore() {
+        if (this.state.habits.length === 0) return 0;
+        const doneHabits = this.state.habits.filter(h => h.done).length;
+        const todayRatio = doneHabits / this.state.habits.length;
+        const shieldBonus = this.state.shieldCracked ? 0 : 25;
+        const streakBonus = Math.min(25, (this.state.streak || 0) * 3);
+        return Math.max(0, Math.min(100, Math.round((todayRatio * 50) + shieldBonus + streakBonus)));
+      },
+
       checkRollover() {
         const today = this.getTodayISO();
         const yesterday = this.getYesterdayISO();
 
         if (this.state.lastResetDate && this.state.lastResetDate !== today) {
-          // Check if user missed yesterday
+          // Commit yesterday's checked habits into lockedCoins before resetting checkboxes
+          const yesterdayCheckedCoins = this.state.habits.filter(h => h.done).length * 10;
+          this.state.lockedCoins = (this.state.lockedCoins || 0) + yesterdayCheckedCoins;
+
           if (this.state.lastCompletedDate && this.state.lastCompletedDate < yesterday && this.state.streak > 0) {
             if (this.state.streakFreezes > 0) {
               this.state.streakFreezes -= 1;
               this.state.lastCompletedDate = yesterday;
-              setTimeout(() => {
-                this.showToast('❄️ КРИО-ЗАМОРОЗКА СПАСЛА ТВОЙ СТРИК И АВАТАРА!');
-              }, 600);
+              setTimeout(() => this.showToast('❄️ КРИО-ЗАМОРОЗКА СПАСЛА ТВОЙ СТРИК!'), 600);
             } else {
               this.state.streak = 0;
               this.state.day = Math.max(1, this.state.day - 1);
-              setTimeout(() => {
-                this.showToast('⚠️ ПРОПУСК ДНЯ БЕЗ ЗАМОРОЗКИ! СТРИК ОБНУЛЕН');
-              }, 600);
+              setTimeout(() => this.showToast('⚠️ ПРОПУСК ДНЯ! СТРИК ОБНУЛЕН'), 600);
             }
           }
           this.state.habits.forEach(h => h.done = false);
           this.state.lastResetDate = today;
+          this.recalculateCoins();
           this.saveState();
         } else if (!this.state.lastResetDate) {
           this.state.lastResetDate = today;
@@ -898,48 +971,61 @@
       },
 
       // =====================================================
-      // PHASE 5: MONETIZATION, TELEGRAM STARS & COSMETICS SHOP
+      // MONETIZATION, CLAN CREATION (200⭐), PRO MONTHLY & SHOP PREVIEW
       // =====================================================
 
-      /**
-       * Production-ready stub for Telegram Stars payments.
-       * When backend bot is connected, pass a real invoice slug/URL to tg.openInvoice(url, cb).
-       */
       buyWithTelegramStars(itemId) {
         Haptics.impact('medium');
 
         const catalogItem = SHOP_COSMETICS.find(i => i.id === itemId);
+        let typeLabel = 'TELEGRAM STARS INVOICE';
         let title = 'МОДУЛЬ PROJECT 90';
-        let priceStars = 50;
+        let desc = 'Разовая покупка через Telegram Stars.';
+        let priceText = '50 ⭐';
 
-        if (itemId === 'titan_pro') {
+        if (itemId === 'titan_pro_monthly') {
           if (this.state.isPro) {
-            this.showToast('СТАТУС «ТИТАН PRO» УЖЕ АКТИВЕН!');
+            this.showToast('ПОДПИСКА «ТИТАН PRO» УЖЕ АКТИВНА!');
             return;
           }
-          title = 'СТАТУС «ТИТАН PRO» (НАВСЕГДА)';
-          priceStars = 150;
+          typeLabel = 'ЕЖЕМЕСЯЧНАЯ ПОДПИСКА (30 ДНЕЙ)';
+          title = 'ПОДПИСКА «ТИТАН PRO»';
+          desc = 'Снимает лимит в 4 привычки, выдает Неоновые крылья и +2 заморозки каждый месяц.';
+          priceText = '150 ⭐ / МЕСЯЦ';
+        } else if (itemId === 'create_clan') {
+          const clanInput = document.getElementById('create-clan-name-input');
+          const desiredName = (clanInput?.value || '').trim();
+          if (!desiredName) {
+            Haptics.notify('warning');
+            this.showToast('ВВЕДИ НАЗВАНИЕ КЛАНА ПЕРЕД СОЗДАНИЕМ');
+            clanInput?.focus();
+            return;
+          }
+          typeLabel = 'РАЗОВАЯ ПОКУПКА // СОЗДАНИЕ КЛАНА';
+          title = `КЛАН «${desiredName.toUpperCase()}»`;
+          desc = 'Открывает лидерборд сквада, реферальные инвайты и механику пинков друзей.';
+          priceText = '200 ⭐ (РАЗОВО)';
         } else if (itemId === 'streak_freeze') {
           if (this.state.streakFreezes >= 5) {
             this.showToast('МАКСИМУМ 5 КРИО-ЗАМОРОЗОК В ЗАПАСЕ');
             return;
           }
           title = '+1 КРИО-ЗАМОРОЗКА СТРИКА ❄️';
-          priceStars = 25;
+          priceText = '25 ⭐ (РАЗОВО)';
         } else if (catalogItem) {
           title = catalogItem.title;
-          priceStars = catalogItem.costStars || 75;
+          priceText = `${catalogItem.costStars || 75} ⭐ (РАЗОВО)`;
         }
 
-        // Real Telegram WebApp Invoice Hook (if invoiceUrl is provided by backend)
-        // Example: tg.openInvoice('https://t.me/$invoiceSlug', (status) => { if (status === 'paid') ... })
+        document.getElementById('stars-modal-type').textContent = typeLabel;
         document.getElementById('stars-modal-title').textContent = title;
-        document.getElementById('stars-modal-price').textContent = priceStars;
+        document.getElementById('stars-modal-desc').textContent = desc;
+        document.getElementById('stars-modal-price').textContent = priceText;
+
         const modal = document.getElementById('stars-invoice-modal');
         modal.classList.remove('hidden');
 
-        const confirmBtn = document.getElementById('stars-confirm-btn');
-        confirmBtn.onclick = () => {
+        document.getElementById('stars-confirm-btn').onclick = () => {
           modal.classList.add('hidden');
           this.onTelegramStarsSuccess(itemId);
         };
@@ -954,17 +1040,26 @@
         SoundFX.play('powerup');
         Haptics.notify('success');
 
-        if (itemId === 'titan_pro') {
+        if (itemId === 'titan_pro_monthly') {
           this.state.isPro = true;
+          this.state.proExpiresAt = Date.now() + 30 * 86400 * 1000;
           this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 2);
           if (!this.state.ownedItems.includes('wings_neon')) {
             this.state.ownedItems.push('wings_neon');
           }
           this.state.equipped.wings = 'wings_neon';
-          this.showToast('⭐ ТИТАН PRO АКТИВИРОВАН! ЛИМИТЫ СНЯТЫ + КРЫЛЬЯ');
+          this.previewItemId = null;
+          this.showToast('⭐ ПОДПИСКА ТИТАН PRO ОФОРМЛЕНА НА 30 ДНЕЙ!');
+        } else if (itemId === 'create_clan') {
+          const clanInput = document.getElementById('create-clan-name-input');
+          const desiredName = (clanInput?.value || 'WINTER SQUAD').trim().toUpperCase();
+          this.state.hasClan = true;
+          this.state.clanName = desiredName;
+          if (clanInput) clanInput.value = '';
+          this.showToast(`🔥 КЛАН «${desiredName}» СОЗДАН! ПРИГЛАШАЙ ДРУЗЕЙ`);
         } else if (itemId === 'streak_freeze') {
           this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
-          this.showToast('❄️ +1 КРИО-ЗАМОРОЗКА ДОБАВЛЕНА В АРСЕНАЛ!');
+          this.showToast('❄️ +1 КРИО-ЗАМОРОЗКА ДОБАВЛЕНА!');
         } else {
           const item = SHOP_COSMETICS.find(i => i.id === itemId);
           if (item) {
@@ -972,7 +1067,8 @@
               this.state.ownedItems.push(item.id);
             }
             this.state.equipped[item.slot] = item.id;
-            this.showToast(`⭐ РАЗБЛОКИРОВАНО И НАДЕТО: ${item.title}`);
+            this.previewItemId = null;
+            this.showToast(`⭐ КУПЛЕНО И НАДЕТО: ${item.title}`);
           }
         }
 
@@ -981,6 +1077,7 @@
       },
 
       buyStreakFreezeWithCoins() {
+        this.recalculateCoins();
         if (this.state.streakFreezes >= 5) {
           this.showToast('МАКСИМУМ 5 ЗАМОРОЗОК В ИНВЕНТАРЕ');
           return;
@@ -990,8 +1087,9 @@
           this.showToast('НУЖНО 150 ⚡ МОНЕТ ДИСЦИПЛИНЫ');
           return;
         }
-        this.state.coins -= 150;
+        this.state.spentCoins = (this.state.spentCoins || 0) + 150;
         this.state.streakFreezes += 1;
+        this.recalculateCoins();
         SoundFX.play('powerup');
         Haptics.notify('success');
         this.saveState();
@@ -999,15 +1097,17 @@
         this.showToast('❄️ КРИО-ЗАМОРОЗКА КУПЛЕНА ЗА 150⚡!');
       },
 
-      unlockOrEquipCosmetic(itemId) {
+      // FIX #4: Shop Try-On Preview Mechanic
+      previewOrToggleCosmetic(itemId) {
+        Haptics.impact('light');
         const item = SHOP_COSMETICS.find(i => i.id === itemId);
         if (!item) return;
 
-        const isUnlockedByStreak = item.type === 'streak' && (this.state.bestStreak >= item.reqStreak || this.state.streak >= item.reqStreak);
-        const isOwned = this.state.ownedItems.includes(item.id) || isUnlockedByStreak || (item.id === 'wings_neon' && this.state.isPro);
+        const isOwned = this.state.ownedItems.includes(item.id) || (item.id === 'wings_neon' && this.state.isPro);
 
         if (isOwned) {
-          // Toggle equip / unequip
+          // Directly equip or unequip owned item
+          this.previewItemId = null;
           if (this.state.equipped[item.slot] === item.id) {
             this.state.equipped[item.slot] = null;
             this.showToast(`СНЯТО: ${item.title}`);
@@ -1016,109 +1116,460 @@
             SoundFX.play('powerup');
             this.showToast(`ЭКИПИРОВАНО: ${item.title}`);
           }
-          Haptics.impact('medium');
           this.saveState();
           this.renderAll();
-          return;
+        } else {
+          // Activate temporary preview on Avatar
+          this.previewItemId = item.id;
+          this.renderAvatar();
+          this.renderShop();
+          this.showToast(`👁 ПРИМЕРКА: ${item.title}`);
         }
+      },
 
-        // Purchase logic if not owned yet
+      clearShopPreview() {
+        if (!this.previewItemId) return;
+        this.previewItemId = null;
+        Haptics.impact('light');
+        this.renderAvatar();
+        this.renderShop();
+      },
+
+      buyPreviewedCosmetic(itemId) {
+        const item = SHOP_COSMETICS.find(i => i.id === itemId);
+        if (!item) return;
+
         if (item.type === 'stars') {
           this.buyWithTelegramStars(item.id);
           return;
         }
 
+        this.recalculateCoins();
         if (this.state.coins < item.costCoins) {
           Haptics.notify('error');
-          this.showToast(`НЕХВАТКА МОНЕТ: НУЖНО ${item.costCoins} ⚡`);
+          this.showToast(`НЕХВАТКА МОНЕТ: НУЖНО ${item.costCoins} ⚡ (У ТЕБЯ ${this.state.coins} ⚡)`);
           return;
         }
 
-        this.state.coins -= item.costCoins;
+        this.state.spentCoins = (this.state.spentCoins || 0) + item.costCoins;
         this.state.ownedItems.push(item.id);
         this.state.equipped[item.slot] = item.id;
+        this.previewItemId = null;
+        this.recalculateCoins();
+
         SoundFX.play('powerup');
         Haptics.notify('success');
         this.saveState();
         this.renderAll();
-        this.showToast(`КУПЛЕНО И НАДЕТО: ${item.title}!`);
+        this.showToast(`⚡ КУПЛЕНО И НАДЕТО: ${item.title}!`);
       },
 
       renderShop() {
+        this.recalculateCoins();
         document.getElementById('shop-coins').textContent = this.state.coins;
         document.getElementById('shop-freezes').textContent = this.state.streakFreezes;
         document.getElementById('freeze-stock-badge').textContent = this.state.streakFreezes;
 
-        const mod7 = (this.state.streak || 0) % 7;
-        document.getElementById('freeze-milestone-text').textContent = `${mod7} / 7 ДН.`;
-
-        // PRO Banner status
+        // Render PRO Subscription button state
         const proActions = document.getElementById('pro-buy-actions');
         if (this.state.isPro) {
           proActions.innerHTML = `
             <div class="w-full py-2.5 rounded-xl bg-cyber-emerald/20 border border-cyber-emerald text-cyber-emerald font-mono font-black text-xs text-center uppercase">
-              ✓ СТАТУС «ТИТАН PRO» АКТИВЕН НАВСЕГДА
+              ✓ ПОДПИСКА «ТИТАН PRO» АКТИВНА (БЕЗЛИМИТ ВКЛЮЧЕН)
             </div>
           `;
         }
 
-        // Cosmetics List
+        // Render Preview Action Bar
+        const previewBar = document.getElementById('shop-preview-action-bar');
+        const previewStatus = document.getElementById('shop-preview-status');
+        const previewItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
+
+        if (previewItem) {
+          previewBar.classList.remove('hidden');
+          previewStatus.textContent = 'РЕЖИМ ПРИМЕРКИ';
+          previewStatus.className = 'text-cyber-gold font-bold animate-pulse';
+          document.getElementById('shop-preview-item-name').textContent = previewItem.title;
+          const buyBtn = document.getElementById('shop-preview-buy-btn');
+          buyBtn.textContent = `КУПИТЬ ЗА ${previewItem.badge}`;
+          buyBtn.onclick = () => this.buyPreviewedCosmetic(previewItem.id);
+        } else {
+          previewBar.classList.add('hidden');
+          previewStatus.textContent = 'ТЕКУЩАЯ ЭКИПИРОВКА';
+          previewStatus.className = 'text-slate-400';
+        }
+
+        // Render Cosmetics Cards
         const list = document.getElementById('shop-cosmetics-list');
         list.innerHTML = SHOP_COSMETICS.map(item => {
-          const isUnlockedByStreak = item.type === 'streak' && (this.state.bestStreak >= item.reqStreak || this.state.streak >= item.reqStreak);
-          const isOwned = this.state.ownedItems.includes(item.id) || isUnlockedByStreak || (item.id === 'wings_neon' && this.state.isPro);
+          const isOwned = this.state.ownedItems.includes(item.id) || (item.id === 'wings_neon' && this.state.isPro);
           const isEquipped = this.state.equipped?.[item.slot] === item.id;
+          const isPreviewing = this.previewItemId === item.id;
 
-          let btnText = item.badge;
-          let btnClass = 'bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan';
-
+          let actionHtml = '';
           if (isEquipped) {
-            btnText = '✓ НАДЕТО (СНЯТЬ)';
-            btnClass = 'bg-cyber-emerald text-black font-black border border-cyber-emerald';
+            actionHtml = `
+              <button onclick="App.previewOrToggleCosmetic('${item.id}')" class="shrink-0 px-3 py-2 rounded-xl font-mono text-[10px] font-black uppercase bg-cyber-emerald text-black">
+                ✓ НАДЕТО
+              </button>
+            `;
           } else if (isOwned) {
-            btnText = 'НАДЕТЬ';
-            btnClass = 'bg-slate-800 border border-cyber-cyan text-cyber-cyan';
-          } else if (item.type === 'stars') {
-            btnClass = 'bg-cyber-gold/20 border border-cyber-gold text-cyber-gold';
+            actionHtml = `
+              <button onclick="App.previewOrToggleCosmetic('${item.id}')" class="shrink-0 px-3 py-2 rounded-xl font-mono text-[10px] font-bold uppercase bg-slate-800 border border-cyber-cyan text-cyber-cyan">
+                НАДЕТЬ
+              </button>
+            `;
+          } else {
+            actionHtml = `
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button onclick="App.previewOrToggleCosmetic('${item.id}')" 
+                  class="px-2.5 py-2 rounded-xl font-mono text-[10px] font-bold uppercase border transition ${
+                    isPreviewing ? 'bg-cyber-cyan text-black border-cyber-cyan font-black' : 'bg-slate-900 border-slate-700 text-slate-300'
+                  }">
+                  👁 ПРИМЕРИТЬ
+                </button>
+                <button onclick="App.buyPreviewedCosmetic('${item.id}')" 
+                  class="px-3 py-2 rounded-xl font-mono text-[10px] font-black uppercase bg-cyber-gold/20 border border-cyber-gold text-cyber-gold active:scale-95">
+                  КУПИТЬ (${item.badge})
+                </button>
+              </div>
+            `;
           }
 
           return `
-            <div class="bg-cyber-card border ${isEquipped ? 'border-cyber-emerald/60' : 'border-cyber-border'} rounded-2xl p-3.5 flex items-center justify-between gap-3">
+            <div class="bg-cyber-card border ${isPreviewing ? 'border-cyber-gold' : isEquipped ? 'border-cyber-emerald/60' : 'border-cyber-border'} rounded-2xl p-3.5 flex items-center justify-between gap-2.5 transition">
               <div class="min-w-0">
-                <div class="flex items-center gap-1.5">
-                  <span class="text-xs font-mono font-bold text-white truncate">${item.title}</span>
-                </div>
+                <div class="text-xs font-mono font-bold text-white truncate">${item.title}</div>
                 <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${item.desc}</p>
               </div>
-              <button onclick="App.unlockOrEquipCosmetic('${item.id}')" 
-                class="shrink-0 px-3 py-2 rounded-xl font-mono text-[10px] font-bold uppercase active:scale-95 transition ${btnClass}">
-                ${btnText}
-              </button>
+              ${actionHtml}
             </div>
           `;
         }).join('');
       },
 
       // =====================================================
-      // CORE HABITS, ANTI-HABITS & CLAN ENGINE
+      // HABITS & ANTI-HABITS (FIX #2 & #5: CLEAN INIT, PRO LIMITS, NO COIN EXPLOIT)
       // =====================================================
 
-      getMiniAvatarSVG(day) {
-        const info = this.getStageInfo(day);
-        return `
-          <svg viewBox="0 0 100 100" class="w-11 h-11 shrink-0 rounded-xl bg-[#080a10] border border-slate-800 p-1">
-            <circle cx="50" cy="50" r="38" fill="${info.primary}" fill-opacity="0.14" />
-            ${info.stage >= 3 ? `<circle cx="50" cy="50" r="36" fill="none" stroke="${info.primary}" stroke-width="1.5" stroke-dasharray="6 4" />` : ''}
-            ${info.stage === 5 ? `<ellipse cx="50" cy="18" rx="16" ry="4" fill="none" stroke="#fcee0a" stroke-width="2" />` : ''}
-            <polygon points="50,24 72,38 66,68 50,80 34,68 28,38" fill="#0b0f19" stroke="${info.primary}" stroke-width="2.5" />
-            <polygon points="36,46 50,51 64,46 60,54 50,57 40,54" fill="${info.primary}" />
-          </svg>
-        `;
+      toggleHabit(id) {
+        const habit = this.state.habits.find(h => h.id === id);
+        if (!habit) return;
+
+        if (habit.done) {
+          // User wants to uncheck (true -> false): verify they haven't spent those 10 coins already
+          this.recalculateCoins();
+          if (this.state.coins < 10) {
+            Haptics.notify('error');
+            this.showToast('НЕЛЬЗЯ СНЯТЬ ГАЛОЧКУ: МОНЕТЫ УЖЕ ПОТРАЧЕНЫ В МАГАЗИНЕ');
+            return;
+          }
+          habit.done = false;
+          this.recalculateCoins();
+          SoundFX.play('uncheck');
+          Haptics.impact('light');
+          this.showToast('ОТМЕТКА СНЯТА // -10 ⚡');
+        } else {
+          // false -> true (+10 coins strictly bound to checked state)
+          habit.done = true;
+          this.recalculateCoins();
+          SoundFX.play('coin');
+          Haptics.impact('medium');
+
+          const av = document.getElementById('avatar-container');
+          av.classList.add('scale-105');
+          setTimeout(() => av.classList.remove('scale-105'), 200);
+
+          this.showToast('ПРИВЫЧКА ВЫПОЛНЕНА // +10 ⚡');
+        }
+
+        this.saveState();
+        this.renderAll();
       },
+
+      isHabitLimitReached() {
+        return !this.state.isPro && this.state.habits.length >= 4;
+      },
+
+      openHabitModal() {
+        if (this.isHabitLimitReached()) {
+          Haptics.notify('warning');
+          this.showToast('🔒 ДОСТИГНУТ ЛИМИТ (4/4). ОФОРМИ ПОДПИСКУ ТИТАН PRO!');
+          this.switchTab('shop');
+          return;
+        }
+        Haptics.impact('light');
+        document.getElementById('habit-modal').classList.remove('hidden');
+        this.selectCatalogCategory(this.currentCatalogCat);
+        lucide.createIcons();
+      },
+
+      closeHabitModal() {
+        Haptics.impact('light');
+        document.getElementById('habit-modal').classList.add('hidden');
+      },
+
+      selectCatalogCategory(cat) {
+        this.currentCatalogCat = cat;
+        const styles = {
+          str: 'bg-cyber-crimson/20 text-cyber-crimson border border-cyber-crimson/40',
+          int: 'bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/40',
+          reg: 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40'
+        };
+        ['str', 'int', 'reg'].forEach(c => {
+          const btn = document.getElementById(`cat-btn-${c}`);
+          btn.className = `py-1.5 rounded-lg font-mono text-[11px] font-bold transition ${c === cat ? styles[c] : 'text-slate-400'}`;
+        });
+
+        const limitReached = this.isHabitLimitReached();
+        document.getElementById('modal-limit-badge').textContent = this.state.isPro
+          ? `${this.state.habits.length} / ∞ (PRO)`
+          : `${this.state.habits.length} / 4`;
+
+        const customAddBtn = document.getElementById('btn-modal-custom-add');
+        if (limitReached) {
+          customAddBtn.disabled = true;
+          customAddBtn.textContent = 'ЛИМИТ 4/4';
+          customAddBtn.className = 'px-4 py-2.5 rounded-xl bg-slate-800 text-slate-500 font-mono text-xs font-bold cursor-not-allowed';
+        } else {
+          customAddBtn.disabled = false;
+          customAddBtn.textContent = 'ДОБАВИТЬ';
+          customAddBtn.className = 'px-4 py-2.5 rounded-xl bg-cyber-cyan text-black font-mono text-xs font-black active:scale-95 transition';
+        }
+
+        const presets = HABIT_CATALOG[cat] || [];
+        const container = document.getElementById('catalog-presets-list');
+        container.innerHTML = presets.map((p, idx) => {
+          const alreadyAdded = this.state.habits.some(h => h.title.toLowerCase() === p.title.toLowerCase());
+          const disabled = alreadyAdded || limitReached;
+          return `
+            <div class="bg-slate-900/90 border border-cyber-border rounded-xl p-3 flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-[9px] font-mono text-cyber-cyan uppercase">${p.tag}</div>
+                <div class="text-xs font-medium text-white truncate">${p.title}</div>
+              </div>
+              <button onclick="App.addPresetHabit('${cat}', ${idx})" 
+                ${disabled ? 'disabled' : ''}
+                class="shrink-0 px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold transition ${
+                  disabled 
+                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
+                    : 'bg-cyber-cyan/20 border border-cyber-cyan/50 text-cyber-cyan active:scale-95'
+                }">
+                ${alreadyAdded ? 'ДОБАВЛЕНО' : limitReached ? 'ЛИМИТ 4/4' : '+ ДОБАВИТЬ'}
+              </button>
+            </div>
+          `;
+        }).join('');
+      },
+
+      addPresetHabit(cat, idx) {
+        if (this.isHabitLimitReached()) {
+          Haptics.notify('warning');
+          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. ОФОРМИ ТИТАН PRO!');
+          return;
+        }
+        const item = HABIT_CATALOG[cat]?.[idx];
+        if (!item) return;
+
+        this.state.habits.push({
+          id: 'habit_' + Date.now(),
+          title: item.title,
+          done: false,
+          category: item.tag.split(' ')[0]
+        });
+
+        Haptics.impact('medium');
+        SoundFX.play('coin');
+        this.saveState();
+        this.selectCatalogCategory(cat);
+        this.renderAll();
+        this.showToast('ПРИВЫЧКА ДОБАВЛЕНА В ПРОТОКОЛ');
+      },
+
+      addCustomHabit() {
+        if (this.isHabitLimitReached()) {
+          Haptics.notify('warning');
+          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. ОФОРМИ ТИТАН PRO!');
+          return;
+        }
+        const input = document.getElementById('custom-habit-input');
+        const title = input.value.trim();
+        if (!title) return;
+
+        this.state.habits.push({
+          id: 'habit_' + Date.now(),
+          title,
+          done: false,
+          category: 'КАСТОМ'
+        });
+        input.value = '';
+        Haptics.impact('medium');
+        this.saveState();
+        this.selectCatalogCategory(this.currentCatalogCat);
+        this.renderAll();
+        this.showToast('СВОЯ ПРИВЫЧКА ДОБАВЛЕНА');
+      },
+
+      deleteHabit(id, event) {
+        event.stopPropagation();
+        const habit = this.state.habits.find(h => h.id === id);
+        if (habit && habit.done) {
+          this.recalculateCoins();
+          if (this.state.coins < 10) {
+            Haptics.notify('error');
+            this.showToast('НЕЛЬЗЯ УДАЛИТЬ: МОНЕТЫ ЗА ЗАДАЧУ УЖЕ ПОТРАЧЕНЫ');
+            return;
+          }
+        }
+        this.state.habits = this.state.habits.filter(h => h.id !== id);
+        this.recalculateCoins();
+        Haptics.impact('light');
+        this.saveState();
+        this.renderAll();
+      },
+
+      addAntiHabit() {
+        if (!this.state.isPro && this.state.antihabits.length >= 2) {
+          Haptics.notify('warning');
+          this.showToast('🔒 В БАЗОВОЙ ВЕРСИИ ДО 2 ТАЙМЕРОВ. ОФОРМИ ТИТАН PRO!');
+          this.switchTab('shop');
+          return;
+        }
+
+        const input = document.getElementById('new-antihabit-input');
+        const title = input.value.trim();
+        if (!title) {
+          this.showToast('ВВЕДИ НАЗВАНИЕ АНТИ-ПРИВЫЧКИ');
+          return;
+        }
+
+        this.state.antihabits.unshift({
+          id: 'ah_' + Date.now(),
+          title,
+          startTime: Date.now(),
+          bestSeconds: 0,
+          slips: 0
+        });
+        input.value = '';
+        Haptics.impact('medium');
+        this.saveState();
+        this.renderAll();
+        this.showToast('ТАЙМЕР ОТКАЗА ЗАПУЩЕН');
+      },
+
+      deleteAntiHabit(id) {
+        this.state.antihabits = this.state.antihabits.filter(a => a.id !== id);
+        Haptics.impact('light');
+        this.saveState();
+        this.renderAll();
+      },
+
+      relapseAntiHabit(id) {
+        const ah = this.state.antihabits.find(a => a.id === id);
+        if (!ah) return;
+
+        const now = Date.now();
+        const currentSec = Math.max(0, Math.floor((now - ah.startTime) / 1000));
+        if (currentSec > (ah.bestSeconds || 0)) ah.bestSeconds = currentSec;
+
+        ah.startTime = now;
+        ah.slips = (ah.slips || 0) + 1;
+        this.state.totalSlips = (this.state.totalSlips || 0) + 1;
+        this.state.shieldCracked = true;
+        this.state.lastSlipTime = now;
+
+        SoundFX.play('crack');
+        Haptics.notify('error');
+
+        const shell = document.getElementById('app-shell');
+        shell.classList.remove('shake-damage');
+        void shell.offsetWidth;
+        shell.classList.add('shake-damage');
+
+        this.saveState();
+        this.renderAll();
+        this.showToast('⚠️ ЩИТ АВАТАРА ПОВРЕЖДЕН! ТАЙМЕР СБРОШЕН');
+      },
+
+      repairShield() {
+        this.recalculateCoins();
+        if (!this.state.shieldCracked) {
+          this.showToast('ЭНЕРГЕТИЧЕСКИЙ ЩИТ УЖЕ В ПОЛНОЙ НОРМЕ');
+          return;
+        }
+        if (this.state.coins < 30) {
+          Haptics.notify('error');
+          this.showToast('НУЖНО 30⚡ МОНЕТ ДЛЯ КАЛИБРОВКИ ЩИТА');
+          return;
+        }
+        this.state.spentCoins = (this.state.spentCoins || 0) + 30;
+        this.state.shieldCracked = false;
+        this.recalculateCoins();
+        SoundFX.play('powerup');
+        Haptics.notify('success');
+        this.saveState();
+        this.renderAll();
+        this.showToast('🛡 ЭНЕРГЕТИЧЕСКИЙ ЩИТ ВОССТАНОВЛЕН!');
+      },
+
+      lockInDay() {
+        const today = this.getTodayISO();
+        if (this.state.lastCompletedDate === today) {
+          this.showToast('СЕГОДНЯШНИЙ ДЕНЬ УЖЕ ЗАФИКСИРОВАН');
+          return;
+        }
+
+        if (this.state.habits.length === 0) {
+          Haptics.notify('warning');
+          this.showToast('СНАЧАЛА ДОБАВЬ ПРИВЫЧКИ ЧЕРЕЗ «+ КАТАЛОГ ИДЕЙ»');
+          return;
+        }
+
+        const doneCount = this.state.habits.filter(h => h.done).length;
+        if (doneCount === 0) {
+          Haptics.notify('error');
+          this.showToast('ВЫПОЛНИ ХОТЯ БЫ 1 ПРИВЫЧКУ ПЕРЕД ФИКСАЦИЕЙ');
+          return;
+        }
+
+        if (!this.state.completedDays.includes(this.state.day)) {
+          this.state.completedDays.push(this.state.day);
+        }
+
+        this.state.streak += 1;
+        if (this.state.streak > (this.state.bestStreak || 0)) {
+          this.state.bestStreak = this.state.streak;
+        }
+
+        if (this.state.streak % 7 === 0 && this.state.lastFreezeRewardStreak !== this.state.streak) {
+          this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
+          this.state.lastFreezeRewardStreak = this.state.streak;
+          setTimeout(() => this.showToast('🎁 БОНУС ЗА 7 ДНЕЙ СТРИКА: +1 КРИО-ЗАМОРОЗКА ❄️!'), 1200);
+        }
+
+        if (this.state.day < 90) this.state.day += 1;
+        this.state.lastCompletedDate = today;
+
+        const rewardCoins = this.state.isPro ? 60 : 30;
+        this.state.lockedCoins = (this.state.lockedCoins || 0) + rewardCoins;
+        this.state.shieldCracked = false;
+        this.recalculateCoins();
+
+        SoundFX.play('powerup');
+        Haptics.notify('success');
+        this.saveState();
+        this.renderAll();
+        this.showToast(`ДЕНЬ ЗАКРЫТ (+${rewardCoins}⚡)! СЕРИЯ: ${this.state.streak} ДН.`);
+      },
+
+      // =====================================================
+      // CLAN & P2P REFERRAL ENGINE (FIX #3: NO FAKE USERS)
+      // =====================================================
 
       generateMyRefToken() {
         const anyDoneToday = this.state.habits.some(h => h.done) || this.state.lastCompletedDate === this.getTodayISO();
         const payload = {
+          c: (this.state.clanName || 'WINTER SQUAD').slice(0, 18),
           n: (this.state.callsign || 'OPERATOR').slice(0, 16),
           d: this.state.day || 1,
           s: this.state.streak || 0,
@@ -1148,7 +1599,16 @@
 
           if (!data || !data.n) return false;
           const cleanName = String(data.n).toUpperCase().slice(0, 16);
-          if (cleanName === this.state.callsign) return false;
+          if (cleanName === this.state.callsign) {
+            this.showToast('ЭТО ТВОЙ СОБСТВЕННЫЙ REF-КОД');
+            return false;
+          }
+
+          // Automatically activate Clan membership when joining via friend's referral
+          this.state.hasClan = true;
+          if (!this.state.clanName && data.c) {
+            this.state.clanName = String(data.c).toUpperCase();
+          }
 
           const existing = this.state.clanMembers.find(m => m.name.toUpperCase() === cleanName);
           if (existing) {
@@ -1168,10 +1628,21 @@
           this.saveState();
           this.renderAll();
           Haptics.notify('success');
-          this.showToast(`🔥 ОПЕРАТОР ${cleanName} СИНХРОНИЗИРОВАН В КЛАН!`);
+          this.showToast(`🔥 ОПЕРАТОР ${cleanName} ДОБАВЛЕН В КЛАН!`);
           return true;
         } catch (e) {
           return false;
+        }
+      },
+
+      joinClanByRefInput() {
+        const input = document.getElementById('join-clan-ref-input');
+        const ok = this.processRefToken(input?.value || '');
+        if (ok) {
+          input.value = '';
+        } else {
+          Haptics.notify('error');
+          this.showToast('ВВЕДИ КОРРЕКТНЫЙ REF_ КОД ИЛИ ССЫЛКУ ДРУГА');
         }
       },
 
@@ -1190,10 +1661,11 @@
         Haptics.impact('medium');
         const refToken = this.generateMyRefToken();
         const myInfo = this.getStageInfo(this.state.day);
-        const appLink = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/Project90WinterArcBot?startapp=${refToken}`)}&text=${encodeURIComponent(`⚡ Залетай в мой Клан PROJECT 90! Мой Аватар на стадии «${myInfo.title}» (Ур. ${myInfo.stage}, Стрик: ${this.state.streak}🔥). Переходи по ссылке — добавишься в мой лидерборд:`)}`;
+        const text = `⚡ Вступай в наш Клан «${this.state.clanName || 'WINTER SQUAD'}» в PROJECT 90! Мой Аватар на стадии «${myInfo.title}» (Ур. ${myInfo.stage}, Стрик: ${this.state.streak}🔥).\n\nСкопируй мой код для входа: ${refToken}`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/?startapp=${refToken}`)}&text=${encodeURIComponent(text)}`;
 
-        if (tg?.openTelegramLink) tg.openTelegramLink(appLink);
-        else window.open(appLink, '_blank');
+        if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
+        else window.open(shareUrl, '_blank');
       },
 
       copyMyRefCode() {
@@ -1223,350 +1695,98 @@
         Haptics.impact('heavy');
         const myInfo = this.getStageInfo(this.state.day);
         const refToken = this.generateMyRefToken();
-        const botUrl = `https://t.me/Project90WinterArcBot?startapp=${refToken}`;
-        const text = `⚡ Йо, ${friendName}! Мой аватар уже на ${myInfo.stage} уровне («${myInfo.title}», стрик ${this.state.streak}🔥), а ты еще не закрыл задачи за сегодня! Не сливай стрик!`;
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent(text)}`;
+        const text = `⚡ Мой аватар уже на ${myInfo.stage} уровне, а ты еще не закрыл задачи за сегодня! Не сливай стрик! (${friendName}, жду отчет в PROJECT 90 // Код синхронизации: ${refToken})`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/')}&text=${encodeURIComponent(text)}`;
 
         if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
         else window.open(shareUrl, '_blank');
       },
 
-      async loadState() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (raw) {
-          try { this.state = { ...DEFAULT_STATE, ...JSON.parse(raw) }; } catch(e){}
-        }
-        if (tg?.CloudStorage) {
-          return new Promise((resolve) => {
-            tg.CloudStorage.getItem(STORAGE_KEY, (err, val) => {
-              if (!err && val) {
-                try {
-                  const cloud = JSON.parse(val);
-                  if ((cloud.totalCoinsEarned || 0) > (this.state.totalCoinsEarned || 0)) {
-                    this.state = { ...DEFAULT_STATE, ...cloud };
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
-                  }
-                } catch(e){}
-              }
-              resolve();
-            });
-          });
-        }
-      },
+      // =====================================================
+      // AVATAR SVG GENERATOR (FIX #4: CENTERED & SUPPORTS TRY-ON PREVIEW)
+      // =====================================================
 
-      saveState() {
-        const str = JSON.stringify(this.state);
-        localStorage.setItem(STORAGE_KEY, str);
-        if (tg?.CloudStorage) {
-          tg.CloudStorage.setItem(STORAGE_KEY, str);
-        }
-      },
+      buildAvatarSVG(usePreview = false, sizeClass = 'w-44 h-44') {
+        const day = this.state.day;
+        const cracked = this.state.shieldCracked;
+        const info = this.getStageInfo(day);
 
-      startLiveTimers() {
-        if (this.liveTimerInterval) clearInterval(this.liveTimerInterval);
-        this.liveTimerInterval = setInterval(() => {
-          this.updateAntiHabitClocks();
-        }, 1000);
-      },
-
-      formatDuration(totalSec) {
-        const d = Math.floor(totalSec / 86400);
-        const h = Math.floor((totalSec % 86400) / 3600);
-        const m = Math.floor((totalSec % 3600) / 60);
-        const s = Math.floor(totalSec % 60);
-        return {
-          days: d,
-          hours: String(h).padStart(2, '0'),
-          minutes: String(m).padStart(2, '0'),
-          seconds: String(s).padStart(2, '0'),
-          compact: `${d}д ${h}ч ${m}м`
-        };
-      },
-
-      updateAntiHabitClocks() {
-        const now = Date.now();
-        this.state.antihabits.forEach(ah => {
-          const elapsedSec = Math.max(0, Math.floor((now - ah.startTime) / 1000));
-          if (elapsedSec > (ah.bestSeconds || 0)) ah.bestSeconds = elapsedSec;
-          const clockEl = document.getElementById(`ah-clock-${ah.id}`);
-          const bestEl = document.getElementById(`ah-best-${ah.id}`);
-          if (clockEl) {
-            const t = this.formatDuration(elapsedSec);
-            clockEl.innerHTML = `<span class="text-cyber-cyan">${t.days}Д</span> : <span>${t.hours}Ч</span> : <span>${t.minutes}М</span> : <span class="text-slate-400 text-xs">${t.seconds}С</span>`;
-          }
-          if (bestEl) {
-            const b = this.formatDuration(ah.bestSeconds || elapsedSec);
-            bestEl.textContent = `Рекорд: ${b.compact}`;
-          }
-        });
-      },
-
-      relapseAntiHabit(id) {
-        const ah = this.state.antihabits.find(a => a.id === id);
-        if (!ah) return;
-
-        const now = Date.now();
-        const currentSec = Math.max(0, Math.floor((now - ah.startTime) / 1000));
-        if (currentSec > (ah.bestSeconds || 0)) ah.bestSeconds = currentSec;
-
-        ah.startTime = now;
-        ah.slips = (ah.slips || 0) + 1;
-        this.state.totalSlips = (this.state.totalSlips || 0) + 1;
-        this.state.shieldCracked = true;
-        this.state.lastSlipTime = now;
-
-        SoundFX.play('crack');
-        Haptics.notify('error');
-
-        const shell = document.getElementById('app-shell');
-        shell.classList.remove('shake-damage');
-        void shell.offsetWidth;
-        shell.classList.add('shake-damage');
-
-        this.saveState();
-        this.renderAll();
-        this.showToast(`⚠️ ЩИТ АВАТАРА ПОВРЕЖДЕН! ТАЙМЕР СБРОШЕН`);
-      },
-
-      repairShield() {
-        if (!this.state.shieldCracked) {
-          this.showToast('ЭНЕРГЕТИЧЕСКИЙ ЩИТ УЖЕ В ПОЛНОЙ НОРМЕ');
-          return;
-        }
-        if (this.state.coins < 30) {
-          Haptics.notify('error');
-          this.showToast('НУЖНО 30⚡ МОНЕТ ДЛЯ КАЛИБРОВКИ ЩИТА');
-          return;
-        }
-        this.state.coins -= 30;
-        this.state.shieldCracked = false;
-        SoundFX.play('powerup');
-        Haptics.notify('success');
-        this.saveState();
-        this.renderAll();
-        this.showToast('🛡 ЭНЕРГЕТИЧЕСКИЙ ЩИТ ВОССТАНОВЛЕН!');
-      },
-
-      // Freemium Check on Adding Anti-Habits (Max 2 in Free, Unlimited in PRO)
-      addAntiHabit() {
-        if (!this.state.isPro && this.state.antihabits.length >= 2) {
-          Haptics.notify('warning');
-          this.showToast('🔒 В БАЗОВОЙ ВЕРСИИ ДО 2 ТАЙМЕРОВ. ОТКРОЙ ТИТАН PRO!');
-          this.switchTab('shop');
-          return;
+        // Merge equipped state with temporary shop preview if active
+        const eq = { ...(this.state.equipped || {}) };
+        if (usePreview && this.previewItemId) {
+          const pItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
+          if (pItem) eq[pItem.slot] = pItem.id;
         }
 
-        const input = document.getElementById('new-antihabit-input');
-        const title = input.value.trim();
-        if (!title) return;
+        const hasSamuraiAura = eq.aura === 'aura_samurai';
+        const hasNeonWings = eq.wings === 'wings_neon';
+        const hasGhostSkin = eq.skin === 'skin_ghost';
 
-        this.state.antihabits.unshift({
-          id: 'ah_' + Date.now(),
-          title,
-          startTime: Date.now(),
-          bestSeconds: 0,
-          slips: 0
-        });
-        input.value = '';
-        Haptics.impact('medium');
-        this.saveState();
-        this.renderAll();
-        this.showToast('ТАЙМЕР ОТКАЗА ЗАПУЩЕН');
+        const primaryColor = cracked ? '#ff003c' : hasSamuraiAura ? '#ff003c' : hasGhostSkin ? '#00ff66' : info.primary;
+        const bodyFill = hasGhostSkin ? 'rgba(15, 23, 42, 0.55)' : '#0b0f19';
+
+        const wingsSVG = hasNeonWings ? `
+          <g opacity="0.95">
+            <polygon points="62,82 14,44 26,86 16,116 58,112" fill="rgba(252,238,10,0.2)" stroke="#fcee0a" stroke-width="2.2" />
+            <polygon points="138,82 186,44 174,86 184,116 142,112" fill="rgba(252,238,10,0.2)" stroke="#fcee0a" stroke-width="2.2" />
+          </g>
+        ` : '';
+
+        const samuraiAuraSVG = hasSamuraiAura ? `
+          <g class="animate-spin-reverse svg-origin-center">
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#ff003c" stroke-width="2.2" stroke-dasharray="22 8 4 8" />
+            <polygon points="100,10 106,24 94,24" fill="#ff003c" />
+            <polygon points="100,190 106,176 94,176" fill="#ff003c" />
+          </g>
+        ` : '';
+
+        const shieldLayerSVG = cracked ? `
+          <g opacity="0.9">
+            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(255,0,60,0.08)" stroke="#ff003c" stroke-width="2" stroke-dasharray="18 8 4 8" />
+            <polyline points="100,12 92,48 114,72 86,105 110,145 100,188" fill="none" stroke="#ff003c" stroke-width="2.5" />
+          </g>
+        ` : `
+          <g class="animate-shield">
+            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.05)" stroke="#00f0ff" stroke-width="1.6" opacity="0.85" />
+          </g>
+        `;
+
+        return `
+          <svg viewBox="0 0 200 200" class="${sizeClass} block mx-auto overflow-visible" style="filter: drop-shadow(0 0 14px ${primaryColor}55);">
+            <defs>
+              <radialGradient id="avatarGrad_${usePreview ? 'shop' : 'main'}" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="${primaryColor}" stop-opacity="${info.stage === 1 ? 0.45 : 0.85}"/>
+                <stop offset="70%" stop-color="${info.secondary}" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#07080c" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <circle cx="100" cy="100" r="76" fill="url(#avatarGrad_${usePreview ? 'shop' : 'main'})" />
+            ${samuraiAuraSVG}
+            ${wingsSVG}
+            ${info.stage >= 3 ? `<g class="animate-spin-slow svg-origin-center"><circle cx="100" cy="100" r="68" fill="none" stroke="${primaryColor}" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.8" /></g>` : ''}
+            ${info.stage === 5 || this.state.isPro ? `<ellipse cx="100" cy="34" rx="28" ry="7" fill="none" stroke="#fcee0a" stroke-width="2.5" class="animate-pulse" />` : ''}
+            <polygon points="100,48 134,74 126,126 100,148 74,126 66,74" fill="${bodyFill}" stroke="${primaryColor}" stroke-width="2.4" />
+            <polygon points="78,90 100,97 122,90 116,101 100,105 84,101" fill="${primaryColor}" />
+            <polygon points="100,118 106,126 100,134 94,126" fill="${info.secondary}" />
+            ${shieldLayerSVG}
+          </svg>
+        `;
       },
 
-      toggleHabit(id) {
-        const habit = this.state.habits.find(h => h.id === id);
-        if (!habit) return;
-
-        if (habit.done) {
-          habit.done = false;
-          this.state.coins = Math.max(0, this.state.coins - 10);
-          Haptics.impact('light');
-        } else {
-          habit.done = true;
-          this.state.coins += 10;
-          this.state.totalCoinsEarned += 10;
-          SoundFX.play('coin');
-          Haptics.impact('medium');
-
-          const av = document.getElementById('avatar-container');
-          av.classList.add('scale-110');
-          setTimeout(() => av.classList.remove('scale-110'), 220);
-
-          this.showToast('ПРИВЫЧКА ЗАКРЫТА // +10 ⚡');
-        }
-
-        this.saveState();
-        this.renderAll();
-      },
-
-      openHabitModal() {
-        Haptics.impact('light');
-        document.getElementById('habit-modal').classList.remove('hidden');
-        this.selectCatalogCategory(this.currentCatalogCat);
-        lucide.createIcons();
-      },
-
-      closeHabitModal() {
-        Haptics.impact('light');
-        document.getElementById('habit-modal').classList.add('hidden');
-      },
-
-      selectCatalogCategory(cat) {
-        this.currentCatalogCat = cat;
-        const styles = {
-          str: 'bg-cyber-crimson/20 text-cyber-crimson border border-cyber-crimson/40',
-          int: 'bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/40',
-          reg: 'bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40'
-        };
-        ['str', 'int', 'reg'].forEach(c => {
-          const btn = document.getElementById(`cat-btn-${c}`);
-          btn.className = `py-1.5 rounded-lg font-mono text-[11px] font-bold transition ${c === cat ? styles[c] : 'text-slate-400'}`;
-        });
-
-        const presets = HABIT_CATALOG[cat] || [];
-        const container = document.getElementById('catalog-presets-list');
-        container.innerHTML = presets.map((p, idx) => {
-          const alreadyAdded = this.state.habits.some(h => h.title.toLowerCase() === p.title.toLowerCase());
-          return `
-            <div class="bg-slate-900/90 border border-cyber-border rounded-xl p-3 flex items-center justify-between gap-2">
-              <div class="min-w-0">
-                <div class="text-[9px] font-mono text-cyber-cyan uppercase">${p.tag}</div>
-                <div class="text-xs font-medium text-white truncate">${p.title}</div>
-              </div>
-              <button onclick="App.addPresetHabit('${cat}', ${idx})" 
-                ${alreadyAdded ? 'disabled' : ''}
-                class="shrink-0 px-3 py-1.5 rounded-lg font-mono text-[10px] font-bold transition ${
-                  alreadyAdded 
-                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed' 
-                    : 'bg-cyber-cyan/20 border border-cyber-cyan/50 text-cyber-cyan active:scale-95'
-                }">
-                ${alreadyAdded ? 'В СПИСКЕ' : '+ ДОБАВИТЬ'}
-              </button>
-            </div>
-          `;
-        }).join('');
-      },
-
-      // Freemium Check on Adding Habits (Max 4 in Free, Unlimited in PRO)
-      canAddMoreHabits() {
-        if (!this.state.isPro && this.state.habits.length >= 4) {
-          Haptics.notify('warning');
-          this.closeHabitModal();
-          this.switchTab('shop');
-          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. АКТИВИРУЙ ТИТАН PRO!');
-          return false;
-        }
-        return true;
-      },
-
-      addPresetHabit(cat, idx) {
-        if (!this.canAddMoreHabits()) return;
-        const item = HABIT_CATALOG[cat]?.[idx];
-        if (!item) return;
-
-        this.state.habits.push({
-          id: 'habit_' + Date.now(),
-          title: item.title,
-          done: false,
-          category: item.tag.split(' ')[0]
-        });
-
-        Haptics.impact('medium');
-        SoundFX.play('coin');
-        this.saveState();
-        this.selectCatalogCategory(cat);
-        this.renderAll();
-        this.showToast('ПРОТОКОЛ ДОБАВЛЕН');
-      },
-
-      addCustomHabit() {
-        if (!this.canAddMoreHabits()) return;
-        const input = document.getElementById('custom-habit-input');
-        const title = input.value.trim();
-        if (!title) return;
-
-        this.state.habits.push({
-          id: 'habit_' + Date.now(),
-          title,
-          done: false,
-          category: 'КАСТОМ'
-        });
-        input.value = '';
-        Haptics.impact('medium');
-        this.saveState();
-        this.renderAll();
-        this.closeHabitModal();
-        this.showToast('СВОЯ ПРИВЫЧКА ДОБАВЛЕНА');
-      },
-
-      deleteHabit(id, event) {
-        event.stopPropagation();
-        this.state.habits = this.state.habits.filter(h => h.id !== id);
-        Haptics.impact('light');
-        this.saveState();
-        this.renderAll();
-      },
-
-      lockInDay() {
-        const today = this.getTodayISO();
-        if (this.state.lastCompletedDate === today) {
-          this.showToast('СЕГОДНЯШНИЙ ДЕНЬ УЖЕ ЗАФИКСИРОВАН');
-          return;
-        }
-
-        const doneCount = this.state.habits.filter(h => h.done).length;
-        if (doneCount === 0) {
-          Haptics.notify('error');
-          this.showToast('ВЫПОЛНИ ХОТЯ БЫ 1 ПРИВЫЧКУ');
-          return;
-        }
-
-        if (!this.state.completedDays.includes(this.state.day)) {
-          this.state.completedDays.push(this.state.day);
-        }
-
-        this.state.streak += 1;
-        if (this.state.streak > (this.state.bestStreak || 0)) {
-          this.state.bestStreak = this.state.streak;
-        }
-
-        // Free Streak Freeze every 7 streak days!
-        if (this.state.streak % 7 === 0 && this.state.lastFreezeRewardStreak !== this.state.streak) {
-          this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
-          this.state.lastFreezeRewardStreak = this.state.streak;
-          setTimeout(() => {
-            this.showToast('🎁 БОНУС ЗА 7 ДНЕЙ СТРИКА: +1 КРИО-ЗАМОРОЗКА ❄️!');
-          }, 1200);
-        }
-
-        if (this.state.day < 90) this.state.day += 1;
-        this.state.lastCompletedDate = today;
-
-        const rewardCoins = this.state.isPro ? 60 : 30;
-        this.state.coins += rewardCoins;
-        this.state.totalCoinsEarned += rewardCoins;
-        this.state.shieldCracked = false;
-
-        SoundFX.play('powerup');
-        Haptics.notify('success');
-        this.saveState();
-        this.renderAll();
-        this.showToast(`ДЕНЬ ЗАКРЫТ (+${rewardCoins}⚡)! СЕРИЯ: ${this.state.streak} ДН.`);
-      },
-
-      // Render Dynamic SVG Avatar + Equipped Cosmetics (Aura, Wings, Ghost Skin)
       renderAvatar() {
         const day = this.state.day;
         const cracked = this.state.shieldCracked;
         const info = this.getStageInfo(day);
-        const eq = this.state.equipped || {};
+        const eq = { ...(this.state.equipped || {}) };
+        if (this.previewItemId) {
+          const pItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
+          if (pItem) eq[pItem.slot] = pItem.id;
+        }
 
         document.getElementById('avatar-stage-title').textContent = `${info.title} (УР. ${info.stage})`;
         document.getElementById('current-day-label').textContent = day;
         document.getElementById('avatar-level').textContent = info.stage;
 
-        // Custom Progress Bar Skin Check
         const phaseBar = document.getElementById('phase-bar');
         const dayBar = document.getElementById('day-bar');
         if (eq.progressbar === 'bar_cyber_gold') {
@@ -1582,12 +1802,12 @@
         const repairBtn = document.getElementById('btn-repair-shield');
 
         if (cracked) {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-[#1a0b12] to-[#080a10] neon-border-crimson p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-[#1a0b12] to-[#080a10] neon-border-crimson p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-crimson/20 text-cyber-crimson border border-cyber-crimson text-[9px] font-bold mt-0.5 animate-pulse';
           shieldBadge.innerHTML = '<span>⚠️ ЩИТ ПРОБИТ</span>';
           repairBtn.classList.remove('hidden');
         } else {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 text-[9px] font-bold mt-0.5';
           shieldBadge.innerHTML = '<span>🛡 ЩИТ АКТИВЕН</span>';
           repairBtn.classList.add('hidden');
@@ -1608,64 +1828,12 @@
         document.getElementById('phase-xp-text').textContent = phaseText;
         phaseBar.style.width = `${phasePercent}%`;
 
-        // Equipped Cosmetics SVG Layers
-        const hasSamuraiAura = eq.aura === 'aura_samurai';
-        const hasNeonWings = eq.wings === 'wings_neon';
-        const hasGhostSkin = eq.skin === 'skin_ghost';
-
-        const primaryColor = cracked ? '#ff003c' : hasSamuraiAura ? '#ff003c' : hasGhostSkin ? '#00ff66' : info.primary;
-        const bodyFill = hasGhostSkin ? 'rgba(15, 23, 42, 0.45)' : '#0b0f19';
-
-        const wingsSVG = hasNeonWings ? `
-          <!-- EQUIPPED NEON VALKYRIE WINGS -->
-          <g opacity="0.92">
-            <polygon points="62,82 12,42 24,86 14,116 58,112" fill="rgba(252,238,10,0.18)" stroke="#fcee0a" stroke-width="2" />
-            <polygon points="138,82 188,42 176,86 186,116 142,112" fill="rgba(252,238,10,0.18)" stroke="#fcee0a" stroke-width="2" />
-          </g>
-        ` : '';
-
-        const samuraiAuraSVG = hasSamuraiAura ? `
-          <!-- EQUIPPED CYBER-SAMURAI RED AURA -->
-          <g class="animate-spin-reverse">
-            <circle cx="100" cy="100" r="82" fill="none" stroke="#ff003c" stroke-width="2.2" stroke-dasharray="22 8 4 8" />
-            <polygon points="100,10 106,24 94,24" fill="#ff003c" />
-            <polygon points="100,190 106,176 94,176" fill="#ff003c" />
-          </g>
-        ` : '';
-
-        const shieldLayerSVG = cracked ? `
-          <g opacity="0.9">
-            <polygon points="100,10 176,52 176,148 100,190 24,148 24,52" fill="rgba(255,0,60,0.08)" stroke="#ff003c" stroke-width="2" stroke-dasharray="18 8 4 8" />
-            <polyline points="100,10 92,48 114,72 86,105 110,145 100,190" fill="none" stroke="#ff003c" stroke-width="2.5" />
-          </g>
-        ` : `
-          <g class="animate-shield">
-            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.05)" stroke="#00f0ff" stroke-width="1.6" opacity="0.8" />
-          </g>
-        `;
-
-        const svg = `
-          <svg viewBox="0 0 200 200" class="w-48 h-48 transition-transform duration-200 drop-shadow-[0_0_16px_${primaryColor}]">
-            <defs>
-              <radialGradient id="avatarGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="${primaryColor}" stop-opacity="${info.stage === 1 ? 0.4 : 0.85}"/>
-                <stop offset="70%" stop-color="${info.secondary}" stop-opacity="0.3"/>
-                <stop offset="100%" stop-color="#07080c" stop-opacity="0"/>
-              </radialGradient>
-            </defs>
-            <circle cx="100" cy="100" r="76" fill="url(#avatarGrad)" />
-            ${samuraiAuraSVG}
-            ${wingsSVG}
-            ${info.stage >= 3 ? `<g class="animate-spin-slow"><circle cx="100" cy="100" r="68" fill="none" stroke="${primaryColor}" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.8" /></g>` : ''}
-            ${info.stage === 5 || this.state.isPro ? `<ellipse cx="100" cy="36" rx="28" ry="8" fill="none" stroke="#fcee0a" stroke-width="2.5" class="animate-pulse" />` : ''}
-            <polygon points="100,48 134,74 126,126 100,148 74,126 66,74" fill="${bodyFill}" stroke="${primaryColor}" stroke-width="2.2" />
-            <polygon points="78,90 100,97 122,90 116,101 100,105 84,101" fill="${primaryColor}" />
-            <polygon points="100,118 106,126 100,134 94,126" fill="${info.secondary}" />
-            ${shieldLayerSVG}
-          </svg>
-        `;
-
-        document.getElementById('avatar-container').innerHTML = svg;
+        // Render both Hero Avatar and Shop Mannequin Avatar
+        document.getElementById('avatar-container').innerHTML = this.buildAvatarSVG(false, 'w-44 h-44');
+        const shopPreviewBox = document.getElementById('shop-avatar-preview-box');
+        if (shopPreviewBox) {
+          shopPreviewBox.innerHTML = this.buildAvatarSVG(true, 'w-36 h-36');
+        }
       },
 
       renderHabits() {
@@ -1678,18 +1846,42 @@
         document.getElementById('day-progress-text').textContent = `${pct}%`;
         document.getElementById('day-bar').style.width = `${pct}%`;
         document.getElementById('habits-limit-hint').textContent = this.state.isPro
-          ? 'СТАТУС ТИТАН PRO: БЕЗЛИМИТ ПРИВЫЧЕК'
-          : `Лимит базы: ${total}/4 привычек (PRO — безлимит)`;
+          ? `ПОДПИСКА PRO: ${total} ПРИВЫЧЕК (БЕЗЛИМИТ)`
+          : `Добавлено: ${total}/4 привычек (PRO — безлимит)`;
+
+        // Lock "+ Каталог идей" button visually if non-PRO reached 4 habits
+        const openCatBtn = document.getElementById('btn-open-catalog');
+        const openCatText = document.getElementById('btn-open-catalog-text');
+        if (this.isHabitLimitReached()) {
+          openCatBtn.className = 'px-2.5 py-1.5 rounded-lg bg-slate-900 border border-cyber-gold/50 text-cyber-gold font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition';
+          openCatText.textContent = '🔒 ЛИМИТ 4/4 (PRO)';
+        } else {
+          openCatBtn.className = 'px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition';
+          openCatText.textContent = '+ КАТАЛОГ ИДЕЙ';
+        }
+
+        if (total === 0) {
+          list.innerHTML = `
+            <div onclick="App.openHabitModal()" class="bg-cyber-card/70 border border-dashed border-cyber-cyan/40 rounded-2xl p-6 text-center cursor-pointer hover:border-cyber-cyan transition">
+              <div class="text-xs font-mono font-bold text-white uppercase mb-1">Список привычек пуст</div>
+              <p class="text-[11px] text-slate-400 mb-3">Добавь свои первые протоколы из каталога Силы, Разума и Режима (+10⚡ за выполнение).</p>
+              <span class="inline-block px-4 py-2 rounded-xl bg-cyber-cyan/20 border border-cyber-cyan text-cyber-cyan font-mono text-xs font-bold">
+                + ОТКРЫТЬ КАТАЛОГ ИДЕЙ
+              </span>
+            </div>
+          `;
+          return;
+        }
 
         list.innerHTML = this.state.habits.map(h => `
           <div onclick="App.toggleHabit('${h.id}')" 
             class="group flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer ${
               h.done 
-                ? 'bg-slate-900/50 border-cyber-emerald/40 opacity-75' 
+                ? 'bg-slate-900/50 border-cyber-emerald/40 opacity-80' 
                 : 'bg-cyber-card/95 border-cyber-border hover:border-cyber-cyan/50 active:scale-[0.99]'
             }">
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-5 h-5 rounded-md flex items-center justify-center border ${
+              <div class="w-5 h-5 rounded-md flex items-center justify-center border shrink-0 ${
                 h.done ? 'bg-cyber-emerald border-cyber-emerald text-black' : 'border-slate-600 text-transparent'
               }">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
@@ -1703,24 +1895,41 @@
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
               <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-900 border border-slate-800 ${h.done ? 'text-cyber-emerald' : 'text-cyber-gold'}">
-                ${h.done ? 'DONE' : '+10⚡'}
+                ${h.done ? 'АКТИВНО (+10⚡)' : '+10⚡'}
               </span>
-              ${String(h.id).startsWith('habit_') ? `
-                <button onclick="App.deleteHabit('${h.id}', event)" class="text-slate-500 hover:text-cyber-crimson px-1.5 py-0.5 text-xs font-mono">✕</button>
-              ` : ''}
+              <button onclick="App.deleteHabit('${h.id}', event)" class="text-slate-500 hover:text-cyber-crimson px-1.5 py-0.5 text-xs font-mono">✕</button>
             </div>
           </div>
         `).join('');
       },
 
       renderAntiHabits() {
+        const count = this.state.antihabits.length;
         document.getElementById('antihabits-limit-hint').textContent = this.state.isPro
-          ? 'PRO: БЕЗЛИМИТ ТАЙМЕРОВ'
-          : `База: ${this.state.antihabits.length}/2 таймеров`;
+          ? `PRO: ${count} ТАЙМЕРОВ (БЕЗЛИМИТ)`
+          : `Добавлено: ${count}/2 таймеров (PRO — безлимит)`;
+
+        const addBtn = document.getElementById('btn-add-antihabit');
+        if (!this.state.isPro && count >= 2) {
+          addBtn.textContent = '🔒 PRO';
+          addBtn.className = 'px-4 py-2.5 rounded-xl bg-slate-900 border border-cyber-gold/50 text-cyber-gold font-mono text-xs font-bold shrink-0';
+        } else {
+          addBtn.textContent = 'СТАРТ';
+          addBtn.className = 'px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition shrink-0';
+        }
 
         const list = document.getElementById('antihabits-list');
-        const now = Date.now();
+        if (count === 0) {
+          list.innerHTML = `
+            <div class="bg-cyber-card/70 border border-dashed border-cyber-border rounded-2xl p-6 text-center">
+              <div class="text-xs font-mono font-bold text-white uppercase mb-1">Нет активных таймеров отказа</div>
+              <p class="text-[11px] text-slate-400">Введи вредную привычку выше (например, «Без сахара» или «Без курения») и нажми СТАРТ, чтобы запустить живой отсчет чистоты.</p>
+            </div>
+          `;
+          return;
+        }
 
+        const now = Date.now();
         list.innerHTML = this.state.antihabits.map(ah => {
           const elapsedSec = Math.max(0, Math.floor((now - ah.startTime) / 1000));
           const bestSec = Math.max(elapsedSec, ah.bestSeconds || 0);
@@ -1737,6 +1946,7 @@
                     <span class="text-slate-500">Срывов: ${ah.slips || 0}</span>
                   </div>
                 </div>
+                <button onclick="App.deleteAntiHabit('${ah.id}')" class="text-slate-500 hover:text-cyber-crimson text-xs font-mono px-1">✕</button>
               </div>
               <div class="bg-slate-900/90 border border-slate-800 rounded-xl py-2.5 px-3 text-center">
                 <div class="text-[9px] font-mono text-slate-400 uppercase mb-0.5">ЧИСТОЕ ВРЕМЯ БЕЗ СРЫВОВ</div>
@@ -1753,7 +1963,34 @@
         }).join('');
       },
 
+      getMiniAvatarSVG(day) {
+        const info = this.getStageInfo(day);
+        return `
+          <svg viewBox="0 0 100 100" class="w-11 h-11 shrink-0 rounded-xl bg-[#080a10] border border-slate-800 p-1">
+            <circle cx="50" cy="50" r="38" fill="${info.primary}" fill-opacity="0.14" />
+            ${info.stage >= 3 ? `<circle cx="50" cy="50" r="36" fill="none" stroke="${info.primary}" stroke-width="1.5" stroke-dasharray="6 4" />` : ''}
+            ${info.stage === 5 ? `<ellipse cx="50" cy="18" rx="16" ry="4" fill="none" stroke="#fcee0a" stroke-width="2" />` : ''}
+            <polygon points="50,24 72,38 66,68 50,80 34,68 28,38" fill="#0b0f19" stroke="${info.primary}" stroke-width="2.5" />
+            <polygon points="36,46 50,51 64,46 60,54 50,57 40,54" fill="${info.primary}" />
+          </svg>
+        `;
+      },
+
       renderClan() {
+        const emptyView = document.getElementById('clan-empty-view');
+        const activeView = document.getElementById('clan-active-view');
+
+        if (!this.state.hasClan && this.state.clanMembers.length === 0) {
+          emptyView.classList.remove('hidden');
+          activeView.classList.add('hidden');
+          return;
+        }
+
+        emptyView.classList.add('hidden');
+        activeView.classList.remove('hidden');
+
+        document.getElementById('active-clan-title').textContent = this.state.clanName || 'WINTER SQUAD';
+
         const myDoneToday = this.state.habits.some(h => h.done) || this.state.lastCompletedDate === this.getTodayISO();
         const meEntry = {
           id: 'me',
@@ -1837,7 +2074,7 @@
         document.getElementById('stat-card-streak').textContent = `${streak} ДН.`;
         document.getElementById('stat-card-best').textContent = `${best} ДН.`;
         document.getElementById('stat-card-discipline').textContent = `${discipline}%`;
-        document.getElementById('stat-card-discipline-sub').textContent = this.state.shieldCracked ? 'Щит поврежден (-25%)' : 'Щит в норме (+25%)';
+        document.getElementById('stat-card-discipline-sub').textContent = this.state.habits.length === 0 ? 'Добавь привычки' : 'Индекс активности';
         document.getElementById('stat-card-stage').textContent = info.title;
         document.getElementById('stat-card-stage-sub').textContent = `Уровень ${info.stage} // День ${day}/90`;
 
@@ -1881,6 +2118,7 @@
         else this.showToast(`ДЕНЬ ${dayNum}/90 // ВПЕРЕДИ`);
       },
 
+      // FIX #1: Stacked Header Lines on Canvas so Title & Level never collide
       generateAndPreviewHeroCard() {
         Haptics.impact('heavy');
         SoundFX.play('coin');
@@ -1905,7 +2143,7 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        ctx.strokeStyle = 'rgba(0, 240, 255, 0.06)';
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
         ctx.lineWidth = 2;
         for (let x = 0; x <= W; x += 90) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
         for (let y = 0; y <= H; y += 90) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
@@ -1914,33 +2152,44 @@
         ctx.lineWidth = 5;
         ctx.strokeRect(48, 48, W - 96, H - 96);
 
+        // STACKED CENTERED HEADER (No Horizontal Collision Possible)
+        const cx = 540;
+        ctx.textAlign = 'center';
+
+        // Row 1: Main System Title
         ctx.fillStyle = '#00f0ff';
         ctx.font = 'bold 34px monospace';
-        ctx.textAlign = 'left';
-        ctx.fillText('PROJECT 90 // WINTER ARC SYSTEM', 96, 130);
+        ctx.fillText('PROJECT 90 // WINTER ARC SYSTEM', cx, 125);
 
+        // Row 2: Operator Callsign
         ctx.fillStyle = '#94a3b8';
         ctx.font = '26px monospace';
-        ctx.fillText(`OPERATOR: ${this.state.callsign} ${this.state.isPro ? '[PRO]' : ''}`, 96, 175);
+        ctx.fillText(`ОПЕРАТОР: ${this.state.callsign} ${this.state.isPro ? '[PRO]' : ''}`, cx, 172);
 
-        ctx.textAlign = 'right';
+        // Row 3: Distinct Level Badge Pill on its own line
+        const badgeW = 460;
+        const badgeH = 54;
+        ctx.fillStyle = '#111624';
+        ctx.fillRect(cx - badgeW / 2, 198, badgeW, badgeH);
+        ctx.strokeStyle = '#fcee0a';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(cx - badgeW / 2, 198, badgeW, badgeH);
+
         ctx.fillStyle = '#fcee0a';
-        ctx.font = 'bold 34px monospace';
-        ctx.fillText(`LVL ${info.stage} // ${info.title}`, W - 96, 130);
+        ctx.font = 'bold 28px monospace';
+        ctx.fillText(`УР. ${info.stage} // ${info.title}`, cx, 235);
 
-        const cx = 540;
-        const cy = 620;
-
-        const radGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 330);
+        // Central Avatar (Center X: 540, Y: 630)
+        const cy = 630;
+        const radGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 320);
         radGrad.addColorStop(0, accent);
         radGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.12)');
         radGrad.addColorStop(1, 'rgba(7, 8, 12, 0)');
         ctx.fillStyle = radGrad;
         ctx.beginPath();
-        ctx.arc(cx, cy, 330, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 320, 0, Math.PI * 2);
         ctx.fill();
 
-        // Draw Equipped Wings on Poster if active
         if (eq.wings === 'wings_neon') {
           ctx.fillStyle = 'rgba(252, 238, 10, 0.2)';
           ctx.strokeStyle = '#fcee0a';
@@ -1964,7 +2213,6 @@
           ctx.stroke();
         }
 
-        // Core Helmet Silhouette
         ctx.fillStyle = '#0b0f19';
         ctx.strokeStyle = accent;
         ctx.lineWidth = 8;
@@ -1992,10 +2240,10 @@
 
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
-        ctx.font = '900 84px monospace';
+        ctx.font = '900 80px monospace';
         ctx.fillText(`ДЕНЬ ${day} ИЗ 90`, cx, 1020);
 
-        const barX = 120, barY = 1075, barW = W - 240, barH = 38;
+        const barX = 120, barY = 1070, barW = W - 240, barH = 38;
         ctx.fillStyle = '#111827';
         ctx.fillRect(barX, barY, barW, barH);
         const fillW = Math.max(24, Math.round((day / 90) * barW));
@@ -2009,7 +2257,7 @@
         ];
 
         boxes.forEach((b, idx) => {
-          const bx = 96 + idx * 304, by = 1170, bw = 280, bh = 160;
+          const bx = 96 + idx * 304, by = 1165, bw = 280, bh = 160;
           ctx.fillStyle = '#0f121c';
           ctx.fillRect(bx, by, bw, bh);
           ctx.strokeStyle = b.color;
@@ -2026,7 +2274,7 @@
           ctx.fillText(b.val, bx + bw / 2, by + 118);
         });
 
-        const cols = 15, cellS = 48, gap = 12, startX = 96, startY = 1440;
+        const cols = 15, cellS = 48, gap = 12, startX = 96, startY = 1435;
         for (let i = 1; i <= 90; i++) {
           const r = Math.floor((i - 1) / cols);
           const c = (i - 1) % cols;
@@ -2040,7 +2288,7 @@
         ctx.textAlign = 'center';
         ctx.fillStyle = '#00f0ff';
         ctx.font = 'bold 28px monospace';
-        ctx.fillText('T.ME/PROJECT90WINTERARCBOT // ПРИСОЕДИНЯЙСЯ К КЛАНУ', cx, 1840);
+        ctx.fillText('PROJECT 90 // WINTER ARC CHALLENGE', cx, 1840);
 
         this.lastGeneratedCardDataUrl = canvas.toDataURL('image/png');
         document.getElementById('viral-card-preview').src = this.lastGeneratedCardDataUrl;
@@ -2084,7 +2332,78 @@
         this.showToast('КАРТОЧКА СОХРАНЕНА В PNG ✓');
       },
 
+      async loadState() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          try { this.state = { ...DEFAULT_STATE, ...JSON.parse(raw) }; } catch(e){}
+        }
+        if (tg?.CloudStorage) {
+          return new Promise((resolve) => {
+            tg.CloudStorage.getItem(STORAGE_KEY, (err, val) => {
+              if (!err && val) {
+                try {
+                  const cloud = JSON.parse(val);
+                  if ((cloud.day || 1) > (this.state.day || 1) || (cloud.streak || 0) > (this.state.streak || 0)) {
+                    this.state = { ...DEFAULT_STATE, ...cloud };
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.state));
+                  }
+                } catch(e){}
+              }
+              resolve();
+            });
+          });
+        }
+      },
+
+      saveState() {
+        const str = JSON.stringify(this.state);
+        localStorage.setItem(STORAGE_KEY, str);
+        if (tg?.CloudStorage) {
+          tg.CloudStorage.setItem(STORAGE_KEY, str);
+        }
+      },
+
+      startLiveTimers() {
+        if (this.liveTimerInterval) clearInterval(this.liveTimerInterval);
+        this.liveTimerInterval = setInterval(() => {
+          this.updateAntiHabitClocks();
+        }, 1000);
+      },
+
+      formatDuration(totalSec) {
+        const d = Math.floor(totalSec / 86400);
+        const h = Math.floor((totalSec % 86400) / 3600);
+        const m = Math.floor((totalSec % 3600) / 60);
+        const s = Math.floor(totalSec % 60);
+        return {
+          days: d,
+          hours: String(h).padStart(2, '0'),
+          minutes: String(m).padStart(2, '0'),
+          seconds: String(s).padStart(2, '0'),
+          compact: `${d}д ${h}ч ${m}м`
+        };
+      },
+
+      updateAntiHabitClocks() {
+        const now = Date.now();
+        this.state.antihabits.forEach(ah => {
+          const elapsedSec = Math.max(0, Math.floor((now - ah.startTime) / 1000));
+          if (elapsedSec > (ah.bestSeconds || 0)) ah.bestSeconds = elapsedSec;
+          const clockEl = document.getElementById(`ah-clock-${ah.id}`);
+          const bestEl = document.getElementById(`ah-best-${ah.id}`);
+          if (clockEl) {
+            const t = this.formatDuration(elapsedSec);
+            clockEl.innerHTML = `<span class="text-cyber-cyan">${t.days}Д</span> : <span>${t.hours}Ч</span> : <span>${t.minutes}М</span> : <span class="text-slate-400 text-xs">${t.seconds}С</span>`;
+          }
+          if (bestEl) {
+            const b = this.formatDuration(ah.bestSeconds || elapsedSec);
+            bestEl.textContent = `🏆 Рекорд: ${b.compact}`;
+          }
+        });
+      },
+
       renderAll() {
+        this.recalculateCoins();
         document.getElementById('header-streak').textContent = this.state.streak;
         document.getElementById('header-coins').textContent = this.state.coins;
         document.getElementById('header-freezes').textContent = this.state.streakFreezes;
@@ -2100,6 +2419,13 @@
 
       switchTab(tab) {
         Haptics.impact('light');
+        // If leaving Shop without purchasing previewed item, revert Avatar to owned look
+        if (tab !== 'shop' && this.previewItemId) {
+          this.previewItemId = null;
+          this.renderAvatar();
+          this.renderShop();
+        }
+
         ['hero', 'antihabits', 'clan', 'stats', 'shop'].forEach(t => {
           document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
           const btn = document.getElementById(`nav-${t}`);
@@ -2134,7 +2460,7 @@
           h = canvas.height = window.innerHeight;
         });
 
-        const particles = Array.from({ length: 32 }, () => ({
+        const particles = Array.from({ length: 30 }, () => ({
           x: Math.random() * w,
           y: Math.random() * h,
           vx: (Math.random() - 0.5) * 0.3,
