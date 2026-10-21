@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PROJECT 90 // REFACTORED RELEASE</title>
+  <title>PROJECT 90 // ULTIMATE EDITION v3.0</title>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -16,10 +16,10 @@
         extend: {
           colors: {
             cyber: {
-              bg: '#07080c',
-              card: '#0f121c',
-              border: '#1e2436',
-              cyan: '#00f0ff',
+              bg: 'var(--bg-main)',
+              card: 'var(--bg-card)',
+              border: 'var(--border-main)',
+              cyan: 'var(--accent-main)',
               crimson: '#ff003c',
               gold: '#fcee0a',
               emerald: '#00ff66',
@@ -37,29 +37,67 @@
   </script>
 
   <style>
+    :root {
+      --bg-main: #07080c;
+      --bg-card: #0f121c;
+      --bg-sub: #0b0e17;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-main: #1e2436;
+      --accent-main: #00f0ff;
+      --accent-rgb: 0, 240, 255;
+    }
+
+    /* White Monolith Theme Overrides */
+    body.theme-white {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-sub: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-main: #cbd5e1;
+      --accent-main: #0284c7;
+      --accent-rgb: 2, 132, 199;
+    }
+    body.theme-white .text-white { color: #0f172a !important; }
+    body.theme-white .text-slate-300,
+    body.theme-white .text-slate-400 { color: #475569 !important; }
+    body.theme-white .bg-slate-900,
+    body.theme-white .bg-slate-900\/90,
+    body.theme-white .bg-slate-900\/80,
+    body.theme-white .bg-slate-900\/60,
+    body.theme-white .bg-slate-900\/50 {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+    }
+
     * {
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       box-sizing: border-box;
     }
     body {
-      background-color: #07080c;
-      color: #e2e8f0;
+      background-color: var(--bg-main);
+      color: var(--text-main);
       overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
     .scanlines::before {
       content: " ";
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
       z-index: 40;
-      background-size: 100% 3px, 6px 100%;
+      background-size: 100% 3px;
       pointer-events: none;
     }
+    body.theme-white.scanlines::before {
+      display: none;
+    }
     .neon-border-cyan {
-      box-shadow: 0 0 14px rgba(0, 240, 255, 0.18), inset 0 0 12px rgba(0, 240, 255, 0.06);
-      border: 1px solid rgba(0, 240, 255, 0.38);
+      box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2), inset 0 0 12px rgba(var(--accent-rgb), 0.06);
+      border: 1px solid rgba(var(--accent-rgb), 0.45);
     }
     .neon-border-crimson {
       box-shadow: 0 0 16px rgba(255, 0, 60, 0.28), inset 0 0 12px rgba(255, 0, 60, 0.1);
@@ -96,29 +134,26 @@
       60% { transform: translate(-4px, -2px); }
       80% { transform: translate(4px, 2px); }
     }
-    .svg-origin-center {
-      transform-origin: 100px 100px;
-    }
+    .svg-origin-center { transform-origin: 100px 100px; }
     .animate-spin-slow { animation: spin-slow 18s linear infinite; }
     .animate-spin-reverse { animation: spin-reverse 12s linear infinite; }
     .animate-float { animation: float-core 4s ease-in-out infinite; }
     .animate-shield { animation: shield-pulse 3s ease-in-out infinite; }
     .shake-damage { animation: damage-shake 0.45s ease-in-out; }
     ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: #07080c; }
-    ::-webkit-scrollbar-thumb { background: #1e2436; border-radius: 2px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--border-main); border-radius: 2px; }
   </style>
 </head>
 <body class="scanlines font-sans antialiased selection:bg-cyber-cyan selection:text-black">
 
   <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
-  <!-- Hidden High-Res Canvas for Viral Hero Card Generation (1080x1920 Stories Format) -->
   <canvas id="viral-card-canvas" width="1080" height="1920" class="hidden"></canvas>
 
   <div id="app-shell" class="relative z-10 max-w-md mx-auto min-h-screen flex flex-col pb-28 px-4 pt-3">
 
-    <!-- HEADER: System Status, Streak Freeze, Coins & Streak -->
-    <header class="flex items-center justify-between py-2 px-3 rounded-xl bg-cyber-card/85 backdrop-blur-md border border-cyber-border mb-3">
+    <!-- HEADER -->
+    <header class="flex items-center justify-between py-2 px-3 rounded-xl bg-cyber-card/90 backdrop-blur-md border border-cyber-border mb-3">
       <div class="flex items-center gap-2 min-w-0">
         <div class="relative flex h-2.5 w-2.5 shrink-0">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-cyan opacity-75"></span>
@@ -149,18 +184,16 @@
       </div>
     </header>
 
-    <!-- VIEWS CONTAINER -->
+    <!-- MAIN VIEWS -->
     <main class="flex-1">
 
       <!-- VIEW 1: HERO / TODAY -->
       <div id="view-hero" class="space-y-4">
         
-        <!-- AVATAR CARD (FIXED CENTERED ALIGNMENT) -->
-        <div id="avatar-card-box" class="relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300">
+        <div id="avatar-card-box" class="relative rounded-2xl bg-cyber-card neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300">
           
-          <!-- Top HUD Row (Flex-between, no overlap) -->
           <div class="w-full flex items-start justify-between gap-2 z-10">
-            <div class="text-[10px] font-mono text-cyber-cyan/80 leading-tight">
+            <div class="text-[10px] font-mono text-cyber-cyan leading-tight">
               <div>СТАДИЯ: <span id="avatar-stage-title" class="text-white font-bold">СПЯЩИЙ</span></div>
               <div class="mt-0.5">ДЕНЬ: <span id="current-day-label" class="text-cyber-cyan font-bold">1</span>/90</div>
             </div>
@@ -173,13 +206,12 @@
             </div>
           </div>
 
-          <!-- Centered Dynamic SVG Avatar -->
           <div class="my-2 flex items-center justify-center w-full">
             <div id="avatar-container" class="animate-float flex items-center justify-center w-44 h-44 mx-auto"></div>
           </div>
 
           <button id="btn-repair-shield" onclick="App.repairShield()" class="hidden mb-2 px-3 py-1 rounded-lg bg-cyber-crimson/20 border border-cyber-crimson text-[10px] font-mono font-bold text-cyber-crimson hover:bg-cyber-crimson hover:text-white transition">
-            ⚡ ВОССТАНОВИТЬ ЭНЕРГО-ЩИТ (30⚡)
+            ⚡ ВОССТАНОВИТЬ ЭНЕРГО-ЩИТ (120⚡)
           </button>
 
           <!-- DOUBLE PROGRESS BAR -->
@@ -189,8 +221,8 @@
                 <span>ЭВОЛЮЦИЯ АВАТАРА (ФАЗЫ)</span>
                 <span id="phase-xp-text">ФАЗА 1 // 1 / 30 ДН.</span>
               </div>
-              <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
-                <div id="phase-bar" class="h-full bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-gold rounded-full transition-all duration-500" style="width: 3%"></div>
+              <div class="h-2.5 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+                <div id="phase-bar" class="h-full rounded-full transition-all duration-500" style="width: 3%"></div>
               </div>
             </div>
 
@@ -199,14 +231,14 @@
                 <span>ПРОГРЕСС ДНЯ</span>
                 <span id="day-progress-text" class="text-cyber-emerald font-bold">0%</span>
               </div>
-              <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
-                <div id="day-bar" class="h-full bg-gradient-to-r from-emerald-500 to-cyber-emerald rounded-full transition-all duration-500" style="width: 0%"></div>
+              <div class="h-2.5 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+                <div id="day-bar" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- HABITS LIST FOR TODAY (CLEAN BY DEFAULT + LIMIT GUARD) -->
+        <!-- HABITS LIST -->
         <div>
           <div class="flex items-center justify-between mb-2.5 gap-2">
             <div class="min-w-0">
@@ -214,7 +246,7 @@
                 <i data-lucide="check-square" class="w-4 h-4 text-cyber-cyan shrink-0"></i>
                 <span class="truncate">Привычки на сегодня</span>
               </h2>
-              <div id="habits-limit-hint" class="text-[10px] font-mono text-slate-500">Добавлено: 0/4 (PRO — безлимит)</div>
+              <div id="habits-limit-hint" class="text-[10px] font-mono text-slate-400">Добавлено: 0/4 (PRO — безлимит)</div>
             </div>
             <div class="flex items-center gap-2 shrink-0">
               <span id="habits-counter" class="text-[11px] font-mono text-cyber-cyan font-bold">0/0</span>
@@ -228,17 +260,17 @@
           <div id="habits-list" class="space-y-2.5"></div>
         </div>
 
-        <!-- LOCK IN DAY BUTTON -->
+        <!-- LOCK IN DAY -->
         <div>
           <button id="btn-lock-day" onclick="App.lockInDay()" 
-            class="w-full py-3.5 rounded-xl font-mono font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-cyber-cyan to-blue-600 text-black shadow-lg shadow-cyber-cyan/20 active:scale-98">
+            class="w-full py-3.5 rounded-xl font-mono font-black text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-cyber-cyan to-blue-600 text-black shadow-lg active:scale-98">
             <i data-lucide="shield-check" class="w-5 h-5"></i>
             <span>ЗАФИКСИРОВАТЬ ДЕНЬ В МАТРИЦЕ</span>
           </button>
         </div>
       </div>
 
-      <!-- VIEW 2: ANTI-HABITS (EMPTY BY DEFAULT) -->
+      <!-- VIEW 2: ANTI-HABITS -->
       <div id="view-antihabits" class="hidden space-y-4">
         <div id="antihabit-shield-banner" class="bg-cyber-card neon-border-cyan rounded-2xl p-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -247,18 +279,18 @@
             </div>
             <div>
               <div id="ah-shield-title" class="text-xs font-mono font-bold text-white uppercase">Энергетический щит цел</div>
-              <div id="ah-shield-desc" class="text-[11px] text-slate-400">Добавь таймер отказа, чтобы активировать защиту от соблазнов</div>
+              <div id="ah-shield-desc" class="text-[11px] text-slate-400">Добавь таймер отказа для защиты Аватара</div>
             </div>
           </div>
         </div>
 
         <div>
           <div class="flex justify-between items-center mb-1.5">
-            <span class="text-[10px] font-mono uppercase text-slate-400">Новый таймер отказа (Счётчик дней БЕЗ)</span>
-            <span id="antihabits-limit-hint" class="text-[10px] font-mono text-slate-500">База: 0/2 таймеров</span>
+            <span class="text-[10px] font-mono uppercase text-slate-400">Новый таймер отказа (Дни БЕЗ)</span>
+            <span id="antihabits-limit-hint" class="text-[10px] font-mono text-slate-400">База: 0/2 таймеров</span>
           </div>
           <div class="flex gap-2">
-            <input id="new-antihabit-input" type="text" maxlength="36" placeholder="Напр.: Без сахара / Без курения / Без фастфуда..." 
+            <input id="new-antihabit-input" type="text" maxlength="36" placeholder="Напр.: Без сахара / Без вейпа / Без фастфуда..." 
               class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-crimson font-mono" />
             <button id="btn-add-antihabit" onclick="App.addAntiHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition shrink-0">
               СТАРТ
@@ -269,11 +301,104 @@
         <div id="antihabits-list" class="space-y-3"></div>
       </div>
 
-      <!-- VIEW 3: CLAN (NO FAKE USERS + 200 STARS CLAN CREATION) -->
+      <!-- VIEW 3: FINANCE CONTROL ("КАПИТАЛ") -->
+      <div id="view-finance" class="hidden space-y-4">
+        
+        <!-- Capital Top Summary & Daily Limit Radar -->
+        <div class="bg-cyber-card neon-border-cyan rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-cyan">ФИНАНСОВАЯ ДИСЦИПЛИНА</div>
+              <div id="fin-net-balance" class="text-2xl font-mono font-black text-white mt-0.5">0 ₽</div>
+              <div class="text-[10px] font-mono text-slate-400">Свободный баланс</div>
+            </div>
+            <div class="text-right font-mono">
+              <span id="fin-audit-bonus-badge" class="inline-block px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold text-[9px] font-bold">
+                УЧЕТ ДНЯ: +15 ⚡
+              </span>
+              <div class="mt-2 text-[10px] text-slate-400">
+                Доход: <span id="fin-total-income" class="text-cyber-emerald font-bold">+0 ₽</span><br>
+                Расход: <span id="fin-total-expense" class="text-cyber-crimson font-bold">-0 ₽</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Savings Goal Progress Bar -->
+          <div class="pt-2 border-t border-cyber-border">
+            <div class="flex items-center justify-between text-[10px] font-mono mb-1">
+              <span class="text-slate-400">ЦЕЛЬ: <b id="fin-goal-title" class="text-white">ФИНАНСОВАЯ ПОДУШКА</b></span>
+              <button onclick="App.editFinanceLimits()" class="text-cyber-cyan hover:underline">⚙ Изменить цель/лимит</button>
+            </div>
+            <div class="flex justify-between text-[10px] font-mono text-slate-400 mb-1">
+              <span id="fin-goal-progress-label">0 / 50 000 ₽</span>
+              <span id="fin-goal-pct" class="text-cyber-cyan font-bold">0%</span>
+            </div>
+            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+              <div id="fin-goal-bar" class="h-full bg-gradient-to-r from-cyber-cyan to-cyber-emerald rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- Daily Spending Limit Radar -->
+          <div class="pt-2 border-t border-cyber-border">
+            <div class="flex justify-between text-[10px] font-mono mb-1">
+              <span class="text-slate-400">РАСХОД ЗА СЕГОДНЯ (ЛИМИТ ДНЯ)</span>
+              <span id="fin-daily-limit-label" class="font-bold text-cyber-emerald">0 / 1 500 ₽</span>
+            </div>
+            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+              <div id="fin-daily-bar" class="h-full bg-cyber-emerald rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add Transaction Form -->
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono font-bold text-white uppercase flex items-center gap-1.5">
+              <i data-lucide="wallet" class="w-4 h-4 text-cyber-cyan"></i>
+              Новая операция
+            </h3>
+            <div class="grid grid-cols-2 gap-1 bg-slate-900 p-0.5 rounded-lg border border-cyber-border font-mono text-[10px]">
+              <button id="fin-type-exp" onclick="App.setFinType('expense')" class="px-2.5 py-1 rounded-md bg-cyber-crimson text-white font-bold">
+                - РАСХОД
+              </button>
+              <button id="fin-type-inc" onclick="App.setFinType('income')" class="px-2.5 py-1 rounded-md text-slate-400 font-bold">
+                + ДОХОД
+              </button>
+            </div>
+          </div>
+
+          <!-- Category Pills -->
+          <div id="fin-categories-row" class="flex flex-wrap gap-1.5">
+            <!-- Rendered by JS -->
+          </div>
+
+          <div class="flex gap-2">
+            <input id="fin-amount-input" type="number" inputmode="numeric" placeholder="Сумма ₽..." 
+              class="w-28 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-cyan font-mono" />
+            <input id="fin-note-input" type="text" maxlength="32" placeholder="Комментарий (необяз.)..." 
+              class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-cyan font-mono" />
+            <button onclick="App.addTransaction()" class="px-4 py-2.5 rounded-xl bg-cyber-cyan text-black font-mono text-xs font-black active:scale-95 transition shrink-0">
+              ОК
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Breakdown & Recent Transactions -->
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-mono font-bold text-white uppercase">Журнал операций</h3>
+            <span id="fin-tx-count" class="text-[10px] font-mono text-slate-400">0 записей</span>
+          </div>
+          <div id="fin-tx-list" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
+        </div>
+
+      </div>
+
+      <!-- VIEW 4: CLAN (WITH OWNER LICENSE, LEAVE, DISBAND & KICK) -->
       <div id="view-clan" class="hidden space-y-4">
         
-        <!-- STATE A: NO CLAN YET (Empty State with Create for 200⭐ or Join via Ref) -->
-        <div id="clan-empty-view" class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-5 text-center space-y-4">
+        <!-- STATE A: NO CLAN YET -->
+        <div id="clan-empty-view" class="bg-cyber-card neon-border-purple rounded-2xl p-5 text-center space-y-4">
           <div class="w-14 h-14 rounded-2xl bg-cyber-purple/15 border border-cyber-purple/40 mx-auto flex items-center justify-center text-cyber-purple">
             <i data-lucide="shield" class="w-7 h-7"></i>
           </div>
@@ -282,26 +407,28 @@
             <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-purple mb-1">P2P КООПЕРАТИВНЫЙ ПРОТОКОЛ</div>
             <h2 class="text-base font-mono font-black text-white uppercase">ТЫ НЕ СОСТОИШЬ В КЛАНЕ</h2>
             <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-              Создай собственный боевой Клан, чтобы приглашать друзей по реферальной ссылке, отслеживать их форму и пинать тех, кто спит.
+              Создай собственный Клан или вступи в отряд друга по его ref-коду.
             </p>
           </div>
 
-          <!-- Create Clan Input & 200 Stars One-Time Purchase -->
+          <!-- Create Clan Box (Checks if user already owns Clan License!) -->
           <div class="bg-slate-900/90 border border-cyber-border rounded-xl p-3.5 text-left space-y-2.5">
-            <div class="text-[10px] font-mono text-cyber-gold uppercase font-bold">Создание своего Клана (Разовая покупка):</div>
+            <div id="clan-license-label" class="text-[10px] font-mono text-cyber-gold uppercase font-bold">
+              Создание своего Клана (Разовая покупка лицензии):
+            </div>
             <input id="create-clan-name-input" type="text" maxlength="22" placeholder="Название клана (напр. WINTER TITANS)..." 
               class="w-full bg-cyber-card border border-cyber-border rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-gold font-mono" />
-            <button onclick="App.buyWithTelegramStars('create_clan')" 
-              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-gold/20 flex items-center justify-center gap-1.5 active:scale-98 transition">
+            <button id="btn-create-clan-main" onclick="App.handleCreateClanClick()" 
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-1.5 active:scale-98 transition">
               <span>⭐ СОЗДАТЬ КЛАН ЗА 200 STARS (РАЗОВО)</span>
             </button>
           </div>
 
-          <!-- Join Friend's Clan for Free via Ref Code -->
+          <!-- Join Friend's Clan for Free -->
           <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-3.5 text-left space-y-2">
-            <div class="text-[10px] font-mono text-slate-400 uppercase">У друга уже есть клан? Вступи по его коду бесплатно:</div>
+            <div class="text-[10px] font-mono text-slate-400 uppercase">Вступить в клан друга бесплатно:</div>
             <div class="flex gap-2">
-              <input id="join-clan-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
+              <input id="join-clan-ref-input" type="text" placeholder="Вставь ref_... код друга" 
                 class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
               <button onclick="App.joinClanByRefInput()" class="px-3.5 py-2 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 text-cyber-purple font-mono text-[11px] font-bold active:scale-95 shrink-0">
                 ВСТУПИТЬ
@@ -310,17 +437,19 @@
           </div>
         </div>
 
-        <!-- STATE B: ACTIVE CLAN LEADERBOARD -->
+        <!-- STATE B: ACTIVE CLAN -->
         <div id="clan-active-view" class="hidden space-y-4">
-          <div class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-4 space-y-3">
+          <div class="bg-cyber-card neon-border-purple rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div class="w-10 h-10 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 flex items-center justify-center text-cyber-purple shrink-0">
                   <i data-lucide="users" class="w-5 h-5"></i>
                 </div>
                 <div class="min-w-0">
-                  <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-purple">КЛАН АКТИВЕН // P2P CO-OP</div>
-                  <h2 id="active-clan-title" class="text-sm font-mono font-black text-white uppercase truncate">WINTER SQUAD</h2>
+                  <div class="flex items-center gap-1.5">
+                    <span id="clan-role-badge" class="text-[9px] font-mono uppercase px-1.5 py-0.2 rounded bg-cyber-gold/20 text-cyber-gold font-bold">ВЛАДЕЛЕЦ</span>
+                  </div>
+                  <h2 id="active-clan-title" class="text-sm font-mono font-black text-white uppercase truncate mt-0.5">WINTER SQUAD</h2>
                 </div>
               </div>
               <div class="text-right font-mono shrink-0">
@@ -330,9 +459,9 @@
             </div>
 
             <button onclick="App.shareClanInvite()" 
-              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-purple via-fuchsia-600 to-cyber-cyan text-white font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-purple via-fuchsia-600 to-cyber-cyan text-white font-mono font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 active:scale-98 transition">
               <i data-lucide="share-2" class="w-4 h-4"></i>
-              <span>ПРИГЛАСИТЬ В КЛАН / ПОДЕЛИТЬСЯ ФОРМОЙ</span>
+              <span>ПРИГЛАСИТЬ В КЛАН (ОТПРАВИТЬ REF-КОД)</span>
             </button>
 
             <div class="pt-1 flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400">
@@ -341,12 +470,12 @@
                 <span>Скопировать мой ref-код</span>
               </button>
               <button onclick="App.toggleManualSyncBox()" class="text-slate-400 hover:text-white">
-                 + Добавить друга по коду ▾
+                 + Добавить участника по коду ▾
               </button>
             </div>
 
             <div id="manual-sync-box" class="hidden pt-2 border-t border-cyber-border/80 flex gap-2">
-              <input id="manual-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
+              <input id="manual-ref-input" type="text" placeholder="Вставь ref_... код друга" 
                 class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
               <button onclick="App.importManualRef()" class="px-3 py-2 rounded-xl bg-cyber-purple/20 border border-cyber-purple/50 text-cyber-purple font-mono text-[11px] font-bold active:scale-95">
                 ДОБАВИТЬ
@@ -361,11 +490,24 @@
             </div>
             <div id="clan-leaderboard" class="space-y-2.5"></div>
           </div>
+
+          <!-- Clan Management Footer: Leave Clan OR Disband Clan (License Preserved) -->
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 flex items-center justify-between gap-2">
+            <div class="text-[10px] font-mono text-slate-400 leading-snug">
+              <span id="clan-manage-hint">Лицензия создателя сохраняется навсегда при роспуске клана.</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button id="btn-leave-clan" onclick="App.leaveOrDisbandClan()" 
+                class="px-3 py-2 rounded-xl bg-cyber-crimson/15 border border-cyber-crimson/50 text-cyber-crimson font-mono text-[10px] font-bold uppercase active:scale-95 transition">
+                РАСПУСТИТЬ КЛАН
+              </button>
+            </div>
+          </div>
         </div>
 
       </div>
 
-      <!-- VIEW 4: STATS (90-DAY HEATMAP, RECORD CARDS & VIRAL STORY GENERATOR) -->
+      <!-- VIEW 5: STATS -->
       <div id="view-stats" class="hidden space-y-4">
         <div class="grid grid-cols-2 gap-2.5 font-mono">
           <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5">
@@ -427,26 +569,26 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-r from-[#130d24] via-[#0f1322] to-[#0b1b24] neon-border-purple rounded-2xl p-4 space-y-3">
+        <div class="bg-cyber-card neon-border-purple rounded-2xl p-4 space-y-3">
           <div>
             <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold font-mono text-[9px] font-bold mb-1">
               <span>⚡ VIRAL STORY EXPORT // 9:16 HD</span>
             </div>
             <h3 class="text-xs font-mono font-black text-white uppercase tracking-wider">КАРТОЧКА ГЕРОЯ ДЛЯ STORIES / TIKTOK</h3>
             <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-              Рендерит твой Аватар со всеми надетыми скинами, крыльями и матрицей 90 дней без наложения шрифтов.
+              Генерирует постер 1080×1920 с твоим Аватаром, скинами и матрицей 90 дней.
             </p>
           </div>
 
           <button onclick="App.generateAndPreviewHeroCard()" 
-            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-crimson text-white font-mono font-black text-xs uppercase tracking-widest shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
+            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-crimson text-white font-mono font-black text-xs uppercase tracking-widest shadow-lg flex items-center justify-center gap-2 active:scale-98 transition">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
             <span>ПОДЕЛИТЬСЯ КАРТОЧКОЙ ГЕРОЯ</span>
           </button>
         </div>
       </div>
 
-      <!-- VIEW 5: SHOP WITH LIVE TRY-ON PREVIEW & MONTHLY PRO SUBSCRIPTION -->
+      <!-- VIEW 6: SHOP (WITH PROGRESS-BAR PREVIEW, THEMES + 50⭐ CUSTOM COLOR & REBALANCED ECONOMY) -->
       <div id="view-shop" class="hidden space-y-4">
         
         <!-- Top Balance Bar -->
@@ -467,8 +609,8 @@
           </div>
         </div>
 
-        <!-- LIVE AVATAR TRY-ON STAGE IN SHOP -->
-        <div class="bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan rounded-2xl p-4 flex flex-col items-center justify-center relative">
+        <!-- LIVE AVATAR + PROGRESS BAR TRY-ON STAGE IN SHOP -->
+        <div class="bg-cyber-card neon-border-cyan rounded-2xl p-4 flex flex-col items-center justify-center relative">
           <div class="w-full flex items-center justify-between text-[10px] font-mono mb-1">
             <span class="text-cyber-cyan uppercase">ГОЛОГРАММА ПРЕДПРОСМОТРА</span>
             <span id="shop-preview-status" class="text-slate-400">ТЕКУЩАЯ ЭКИПИРОВКА</span>
@@ -477,10 +619,24 @@
           <!-- Centered Shop Avatar Preview -->
           <div id="shop-avatar-preview-box" class="w-36 h-36 flex items-center justify-center mx-auto my-1"></div>
 
+          <!-- NEW: Live Progress Bar Preview inside Shop Stage so user can test bar skins! -->
+          <div class="w-full space-y-1.5 pt-2 mt-1 border-t border-cyber-border/80">
+            <div class="flex justify-between text-[9px] font-mono text-slate-400">
+              <span>ПРЕДПРОСМОТР ШКАЛЫ ОПЫТА И ДНЯ</span>
+              <span id="shop-bar-skin-label" class="text-cyber-cyan font-bold">СТАНДАРТ</span>
+            </div>
+            <div class="h-2.5 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+              <div id="shop-preview-phase-bar" class="h-full rounded-full transition-all duration-300" style="width: 68%"></div>
+            </div>
+            <div class="h-2 w-full bg-slate-900 rounded-full overflow-hidden border border-cyber-border p-0.5">
+              <div id="shop-preview-day-bar" class="h-full rounded-full transition-all duration-300" style="width: 82%"></div>
+            </div>
+          </div>
+
           <!-- Action Bar when previewing an unowned item -->
-          <div id="shop-preview-action-bar" class="hidden w-full pt-2.5 mt-2 border-t border-cyber-border flex items-center justify-between gap-2">
+          <div id="shop-preview-action-bar" class="hidden w-full pt-2.5 mt-2.5 border-t border-cyber-border flex items-center justify-between gap-2">
             <div class="min-w-0">
-              <div class="text-[10px] font-mono text-cyber-gold uppercase">Примерка скина:</div>
+              <div class="text-[10px] font-mono text-cyber-gold uppercase">Примерка модуля:</div>
               <div id="shop-preview-item-name" class="text-xs font-mono font-bold text-white truncate">Скин</div>
             </div>
             <div class="flex items-center gap-1.5 shrink-0">
@@ -494,46 +650,89 @@
           </div>
         </div>
 
-        <!-- 1. TITAN PRO MONTHLY SUBSCRIPTION -->
-        <div id="pro-shop-card" class="relative rounded-2xl bg-gradient-to-br from-[#1f1605] via-[#120d1d] to-[#090d16] neon-border-gold p-4 space-y-3 overflow-hidden">
-          <div class="flex items-start justify-between gap-2">
+        <!-- UI THEME ENGINE (BLUE, RED, WHITE + 50⭐ CUSTOM COLOR PICKER) -->
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
             <div>
-              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold text-black font-mono text-[9px] font-black uppercase mb-1">
-                <span>⭐ ЕЖЕМЕСЯЧНАЯ ПОДПИСКА</span>
-              </div>
-              <h2 class="text-base font-mono font-black text-white uppercase tracking-wide">ПОДПИСКА «ТИТАН PRO»</h2>
-              <p class="text-[11px] text-slate-300 mt-0.5">Снимает лимиты и открывает эксклюзивную экипировку на 30 дней.</p>
+              <h3 class="text-xs font-mono font-bold text-white uppercase flex items-center gap-1.5">
+                <i data-lucide="palette" class="w-4 h-4 text-cyber-cyan"></i>
+                Темы оформления интерфейса
+              </h3>
+              <p class="text-[10px] text-slate-400">Переключай базовые темы или разблокируй свой HEX-цвет</p>
             </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-2 font-mono text-[10px]">
+            <button onclick="App.setTheme('blue')" id="theme-btn-blue" class="py-2.5 px-2 rounded-xl border border-cyber-cyan bg-slate-900 text-white font-bold flex flex-col items-center gap-1 active:scale-95">
+              <span class="w-4 h-4 rounded-full bg-[#00f0ff] border border-white/30"></span>
+              <span>СИНЯЯ</span>
+            </button>
+            <button onclick="App.setTheme('red')" id="theme-btn-red" class="py-2.5 px-2 rounded-xl border border-cyber-border bg-slate-900 text-white font-bold flex flex-col items-center gap-1 active:scale-95">
+              <span class="w-4 h-4 rounded-full bg-[#ff003c] border border-white/30"></span>
+              <span>КРАСНАЯ</span>
+            </button>
+            <button onclick="App.setTheme('white')" id="theme-btn-white" class="py-2.5 px-2 rounded-xl border border-cyber-border bg-slate-900 text-white font-bold flex flex-col items-center gap-1 active:scale-95">
+              <span class="w-4 h-4 rounded-full bg-white border border-slate-400"></span>
+              <span>БЕЛАЯ</span>
+            </button>
+          </div>
+
+          <!-- Custom RGB / HEX Color Picker (50 Telegram Stars) -->
+          <div class="bg-slate-900/90 border border-cyber-border rounded-xl p-3 flex items-center justify-between gap-2">
+            <div class="min-w-0">
+              <div class="text-xs font-mono font-bold text-white">Свой цвет неона (Chroma RGB)</div>
+              <div class="text-[10px] font-mono text-slate-400" id="custom-color-status-text">Выбери абсолютно любой оттенок // 50 ⭐</div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <input id="custom-theme-color-picker" type="color" value="#a855f7" onchange="App.onCustomColorChange(this.value)" 
+                class="w-8 h-8 rounded-lg cursor-pointer bg-transparent border border-slate-700" />
+              <button id="btn-custom-color-action" onclick="App.handleCustomColorAction()" 
+                class="px-3 py-2 rounded-xl bg-cyber-gold/20 border border-cyber-gold text-cyber-gold font-mono text-[10px] font-black uppercase active:scale-95">
+                ⭐ 50 STARS
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TITAN PRO MONTHLY SUBSCRIPTION -->
+        <div id="pro-shop-card" class="relative rounded-2xl bg-gradient-to-br from-[#1f1605] via-[#120d1d] to-[#090d16] neon-border-gold p-4 space-y-3 overflow-hidden">
+          <div>
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold text-black font-mono text-[9px] font-black uppercase mb-1">
+              <span>⭐ ЕЖЕМЕСЯЧНАЯ ПОДПИСКА</span>
+            </div>
+            <h2 class="text-base font-mono font-black text-white uppercase tracking-wide">ПОДПИСКА «ТИТАН PRO»</h2>
+            <p class="text-[11px] text-slate-300 mt-0.5">Снимает лимиты привычек и открывает эксклюзивную экипировку на 30 дней.</p>
           </div>
 
           <ul class="space-y-1.5 text-[11px] font-mono text-slate-200">
             <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Безлимит на привычки и анти-привычки (снятие лимита 4/2)</span></li>
             <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Эксклюзивные <b>Неоновые Крылья</b> + бейдж <b>[PRO/МЕС]</b></span></li>
             <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span><b>+2 Крио-заморозки стрика ❄️</b> каждый месяц</span></li>
-            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Удвоенный бонус за закрытие дня (<b>+60⚡</b> вместо +30⚡)</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Повышенный бонус закрытия дня (<b>+50⚡</b> вместо +25⚡)</span></li>
           </ul>
 
           <div id="pro-buy-actions" class="pt-1">
             <button onclick="App.buyWithTelegramStars('titan_pro_monthly')" 
-              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-gold/25 flex items-center justify-center gap-1.5 active:scale-98 transition">
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-1.5 active:scale-98 transition">
               <span>⭐ ОФОРМИТЬ ТИТАН PRO // 150 STARS В МЕСЯЦ</span>
             </button>
           </div>
         </div>
 
-        <!-- 2.AVATAR COSMETICS (CLICK TO PREVIEW / BUY) -->
+        <!-- AVATAR COSMETICS (REBALANCED 90-DAY ECONOMY TIERS) -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
               <i data-lucide="sparkles" class="w-4 h-4 text-cyber-cyan"></i>
-              Скины и Ауры (Нажми для примерки)
+              Скины, Ауры и Прогресс-бары
             </h3>
+            <span class="text-[10px] font-mono text-slate-400">Тиры I–IV</span>
           </div>
 
           <div id="shop-cosmetics-list" class="space-y-2.5"></div>
         </div>
 
-        <!-- 3. STREAK FREEZE MODULE -->
+        <!-- STREAK FREEZE MODULE (REBALANCED COST: 400 ⚡) -->
         <div class="bg-cyber-card border border-cyber-ice/40 rounded-2xl p-4 space-y-3">
           <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-xl bg-cyber-ice/15 border border-cyber-ice/40 flex items-center justify-center text-cyber-ice shrink-0">
@@ -545,7 +744,7 @@
                 <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyber-ice/20 text-cyber-ice font-bold">Запас: <span id="freeze-stock-badge">1</span>/5</span>
               </div>
               <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
-                1 заморозка дается бесплатно за каждые 7 дней стрика.
+                Спасает серию при пропуске дня. 1 шт. бесплатно каждые 7 дней стрика.
               </p>
             </div>
           </div>
@@ -553,7 +752,7 @@
           <div class="grid grid-cols-2 gap-2">
             <button onclick="App.buyStreakFreezeWithCoins()" 
               class="py-2.5 px-3 rounded-xl bg-cyber-gold/15 border border-cyber-gold/50 text-cyber-gold font-mono font-bold text-[11px] active:scale-95 transition">
-              КУПИТЬ ЗА 150 ⚡
+              КУПИТЬ ЗА 400 ⚡
             </button>
             <button onclick="App.buyWithTelegramStars('streak_freeze')" 
               class="py-2.5 px-3 rounded-xl bg-cyber-ice/15 border border-cyber-ice/50 text-cyber-ice font-mono font-bold text-[11px] active:scale-95 transition">
@@ -566,28 +765,32 @@
 
     </main>
 
-    <!-- BOTTOM NAVIGATION BAR (5 TABS) -->
-    <nav class="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto px-2 pb-3 pt-1 bg-gradient-to-t from-[#07080c] via-[#07080c] to-transparent">
-      <div class="grid grid-cols-5 gap-1 bg-cyber-card/95 backdrop-blur-lg border border-cyber-border rounded-2xl p-1 shadow-2xl">
+    <!-- BOTTOM NAVIGATION BAR (6 TABS: ГЕРОЙ, АНТИ, КАПИТАЛ, КЛАН, СТАТА, МАГАЗ) -->
+    <nav class="fixed bottom-0 left-0 right-0 z-30 max-w-md mx-auto px-1.5 pb-2.5 pt-1 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+      <div class="grid grid-cols-6 gap-1 bg-cyber-card/95 backdrop-blur-lg border border-cyber-border rounded-2xl p-1 shadow-2xl">
         <button id="nav-hero" onclick="App.switchTab('hero')" class="flex flex-col items-center justify-center py-2 rounded-xl bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/30 transition">
           <i data-lucide="user" class="w-4 h-4 mb-0.5"></i>
-          <span class="text-[9px] font-mono font-bold">ГЕРОЙ</span>
+          <span class="text-[8px] font-mono font-bold">ГЕРОЙ</span>
         </button>
         <button id="nav-antihabits" onclick="App.switchTab('antihabits')" class="flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-white transition">
           <i data-lucide="shield-alert" class="w-4 h-4 mb-0.5"></i>
-          <span class="text-[9px] font-mono font-bold">АНТИ</span>
+          <span class="text-[8px] font-mono font-bold">АНТИ</span>
+        </button>
+        <button id="nav-finance" onclick="App.switchTab('finance')" class="flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-white transition">
+          <i data-lucide="wallet" class="w-4 h-4 mb-0.5"></i>
+          <span class="text-[8px] font-mono font-bold">КАПИТАЛ</span>
         </button>
         <button id="nav-clan" onclick="App.switchTab('clan')" class="flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-white transition">
           <i data-lucide="users" class="w-4 h-4 mb-0.5"></i>
-          <span class="text-[9px] font-mono font-bold">КЛАН</span>
+          <span class="text-[8px] font-mono font-bold">КЛАН</span>
         </button>
         <button id="nav-stats" onclick="App.switchTab('stats')" class="flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-white transition">
           <i data-lucide="bar-chart-2" class="w-4 h-4 mb-0.5"></i>
-          <span class="text-[9px] font-mono font-bold">СТАТА</span>
+          <span class="text-[8px] font-mono font-bold">СТАТА</span>
         </button>
         <button id="nav-shop" onclick="App.switchTab('shop')" class="flex flex-col items-center justify-center py-2 rounded-xl text-slate-400 hover:text-white transition">
           <i data-lucide="shopping-bag" class="w-4 h-4 mb-0.5"></i>
-          <span class="text-[9px] font-mono font-bold">МАГАЗ</span>
+          <span class="text-[8px] font-mono font-bold">МАГАЗ</span>
         </button>
       </div>
     </nav>
@@ -635,7 +838,7 @@
     </div>
   </div>
 
-  <!-- MODAL 2: VIRAL HERO CARD PREVIEW (FIXED HEADER LAYOUT) -->
+  <!-- MODAL 2: VIRAL HERO CARD PREVIEW -->
   <div id="viral-card-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-cyber-card neon-border-cyan rounded-2xl p-4 flex flex-col items-center shadow-2xl max-h-[92vh]">
       <div class="w-full flex items-start justify-between gap-2 pb-2.5 mb-2 border-b border-cyber-border">
@@ -703,46 +906,70 @@
   </div>
 
   <script>
-    // New clean storage key so old mock data doesn't pollute first run
-    const STORAGE_KEY = 'PROJECT_90_CLEAN_V2';
+    const STORAGE_KEY = 'PROJECT_90_ULTIMATE_V3';
     const tg = window.Telegram?.WebApp;
 
+    // REBALANCED 90-DAY ECONOMY: 4 Tiers of Cosmetics (From 450 ⚡ up to 3500 ⚡)
     const SHOP_COSMETICS = [
+      {
+        id: 'bar_cyber_gold',
+        slot: 'progressbar',
+        tier: 'TIER I // ~7 ДНЕЙ',
+        title: 'Кислотно-золотой Прогресс-бар',
+        desc: 'Золотой неоновый градиент для шкалы дня и фазы (видно сразу в примерочной выше).',
+        type: 'coins',
+        costCoins: 450,
+        badge: '450 ⚡'
+      },
+      {
+        id: 'bar_crimson_overdrive',
+        slot: 'progressbar',
+        tier: 'TIER II // ~12 ДНЕЙ',
+        title: 'Плазменно-багровый Прогресс-бар',
+        desc: 'Агрессивный кибер-градиент шкалы прогресса в стиле Overdrive.',
+        type: 'coins',
+        costCoins: 750,
+        badge: '750 ⚡'
+      },
       {
         id: 'aura_samurai',
         slot: 'aura',
+        tier: 'TIER II // ~18 ДНЕЙ',
         title: 'Красная аура Кибер-Самурая',
-        desc: 'Багровое плазменное кольцо и боевые лезвия вокруг ядра.',
+        desc: 'Вращающееся багровое кольцо и энергетические клинки вокруг ядра.',
         type: 'coins',
-        costCoins: 120,
-        badge: '120 ⚡'
+        costCoins: 1200,
+        badge: '1200 ⚡'
       },
       {
         id: 'skin_ghost',
         slot: 'skin',
+        tier: 'TIER III // ~30 ДНЕЙ',
         title: 'Скин Призрака (Ghost Protocol)',
         desc: 'Фантомный стелс-корпус и неоново-изумрудный визор.',
         type: 'coins',
-        costCoins: 180,
-        badge: '180 ⚡'
+        costCoins: 2100,
+        badge: '2100 ⚡'
+      },
+      {
+        id: 'aura_singularity',
+        slot: 'aura',
+        tier: 'TIER IV // ~50 ДНЕЙ (МИФИЧЕСКИЙ)',
+        title: 'Аура Квантовой Сингулярности',
+        desc: 'Двойной золотой горизонт событий для ветеранов челленджа.',
+        type: 'coins',
+        costCoins: 3500,
+        badge: '3500 ⚡'
       },
       {
         id: 'wings_neon',
         slot: 'wings',
+        tier: 'PRO EXCLUSIVE',
         title: 'Неоновые крылья Валькирии',
-        desc: 'Энергетические крылья за спиной Аватара (PRO или Stars).',
+        desc: 'Голографические крылья за спиной Аватара (входят в PRO или за Stars).',
         type: 'stars',
         costStars: 75,
         badge: '75 ⭐ STARS'
-      },
-      {
-        id: 'bar_cyber_gold',
-        slot: 'progressbar',
-        title: 'Кислотно-золотой Прогресс-бар',
-        desc: 'Кастомный неоновый градиент для шкалы дня и фазы.',
-        type: 'coins',
-        costCoins: 90,
-        badge: '90 ⚡'
       }
     ];
 
@@ -766,6 +993,11 @@
         { title: 'Убрать все экраны за 60 минут до сна', tag: 'РЕЖИМ // ГИГИЕНА СНА' },
         { title: '2.5 литра чистой воды в течение дня', tag: 'РЕЖИМ // ГИДРАТАЦИЯ' }
       ]
+    };
+
+    const FIN_CATEGORIES = {
+      expense: ['🍔 Еда/Фастфуд', '🚕 Транспорт', '🛒 Покупки', '🎮 Развлечения', '⚡ Импульсивное'],
+      income: ['💼 Зарплата/Фриланс', '🎁 Бонус/Подарок', '📈 Инвестиции/Кэшбэк']
     };
 
     const SoundFX = {
@@ -832,23 +1064,30 @@
       }
     };
 
-    // CLEAN INITIAL STATE: Empty habits [], empty antihabits [], no fake clan members
     const DEFAULT_STATE = {
       callsign: 'OPERATOR_01',
       isPro: false,
       proExpiresAt: null,
+      // Clan & License Persistence
+      clanLicenseOwned: false,
+      isClanOwner: false,
       hasClan: false,
       clanName: '',
+      // Theme Engine
+      theme: 'blue', // 'blue' | 'red' | 'white' | 'custom'
+      customColorUnlocked: false,
+      customColorHex: '#a855f7',
+      // Core Progress
       day: 1,
       streak: 0,
       bestStreak: 0,
       streakFreezes: 1,
       lastFreezeRewardStreak: 0,
       completedDays: [],
-      // Strict accounting for coins to prevent infinite toggle exploit:
-      lockedCoins: 0,      // Coins permanently earned from locked days
-      spentCoins: 0,       // Coins spent in shop
-      coins: 0,            // Current available balance
+      // Strict Economy
+      lockedCoins: 0,
+      spentCoins: 0,
+      coins: 0,
       totalSlips: 0,
       shieldCracked: false,
       lastSlipTime: null,
@@ -863,7 +1102,15 @@
       },
       habits: [],
       antihabits: [],
-      clanMembers: []
+      clanMembers: [],
+      // Finance Module ("КАПИТАЛ")
+      finance: {
+        goalTitle: 'ФИНАНСОВАЯ ПОДУШКА',
+        goalTarget: 50000,
+        dailyLimit: 1500,
+        lastAuditRewardDate: null,
+        transactions: []
+      }
     };
 
     const App = {
@@ -871,14 +1118,14 @@
       currentCatalogCat: 'str',
       liveTimerInterval: null,
       lastGeneratedCardDataUrl: null,
-      // Temporary preview state for Shop Try-On
       previewItemId: null,
+      finType: 'expense',
+      finCategory: FIN_CATEGORIES.expense[0],
 
       async init() {
         if (tg) {
           tg.ready();
           tg.expand();
-          try { tg.setHeaderColor('#07080c'); tg.setBackgroundColor('#07080c'); } catch(e){}
         }
 
         await this.loadState();
@@ -894,9 +1141,11 @@
         if (!Array.isArray(this.state.clanMembers)) this.state.clanMembers = [];
         if (!Array.isArray(this.state.ownedItems)) this.state.ownedItems = [];
         if (!this.state.equipped) this.state.equipped = { aura: null, wings: null, skin: null, progressbar: null };
-        if (typeof this.state.lockedCoins !== 'number') this.state.lockedCoins = 0;
-        if (typeof this.state.spentCoins !== 'number') this.state.spentCoins = 0;
+        if (!this.state.finance) {
+          this.state.finance = JSON.parse(JSON.stringify(DEFAULT_STATE.finance));
+        }
 
+        this.applyThemeVariables();
         this.checkRollover();
         this.recalculateCoins();
         this.checkIncomingReferral();
@@ -916,6 +1165,268 @@
         return d.toISOString().slice(0, 10);
       },
 
+      // =====================================================
+      // THEME ENGINE (BLUE, RED, WHITE + 50⭐ CUSTOM HEX)
+      // =====================================================
+
+      hexToRgbString(hex) {
+        const clean = hex.replace('#', '');
+        const num = parseInt(clean, 16);
+        const r = (num >> 16) & 255;
+        const g = (num >> 8) & 255;
+        const b = num & 255;
+        return `${r}, ${g}, ${b}`;
+      },
+
+      applyThemeVariables() {
+        const root = document.documentElement;
+        const body = document.body;
+        body.classList.remove('theme-white');
+
+        let accent = '#00f0ff';
+        let bgMain = '#07080c';
+        let bgCard = '#0f121c';
+        let borderMain = '#1e2436';
+
+        if (this.state.theme === 'red') {
+          accent = '#ff003c';
+          bgMain = '#090608';
+          bgCard = '#160b10';
+          borderMain = '#361722';
+        } else if (this.state.theme === 'white') {
+          body.classList.add('theme-white');
+          accent = '#0284c7';
+          bgMain = '#f1f5f9';
+          bgCard = '#ffffff';
+          borderMain = '#cbd5e1';
+        } else if (this.state.theme === 'custom' && this.state.customColorUnlocked) {
+          accent = this.state.customColorHex || '#a855f7';
+        }
+
+        root.style.setProperty('--accent-main', accent);
+        root.style.setProperty('--accent-rgb', this.hexToRgbString(accent));
+        root.style.setProperty('--bg-main', bgMain);
+        root.style.setProperty('--bg-card', bgCard);
+        root.style.setProperty('--border-main', borderMain);
+
+        try {
+          if (tg) {
+            tg.setHeaderColor(bgMain);
+            tg.setBackgroundColor(bgMain);
+          }
+        } catch (e) {}
+      },
+
+      setTheme(themeName) {
+        Haptics.impact('light');
+        this.state.theme = themeName;
+        this.applyThemeVariables();
+        this.saveState();
+        this.renderAll();
+        this.showToast(`ТЕМА ПРИМЕНЕНА: ${themeName.toUpperCase()}`);
+      },
+
+      onCustomColorChange(hexVal) {
+        this.state.customColorHex = hexVal;
+        if (this.state.customColorUnlocked) {
+          this.state.theme = 'custom';
+          this.applyThemeVariables();
+          this.saveState();
+          this.renderAll();
+        } else {
+          // Live preview in Shop even before buying!
+          document.documentElement.style.setProperty('--accent-main', hexVal);
+          document.documentElement.style.setProperty('--accent-rgb', this.hexToRgbString(hexVal));
+          this.showToast('👁 ПРЕДПРОСМОТР ЦВЕТА (КУПИ ЗА 50⭐ ЧТОБЫ СОХРАНИТЬ)');
+        }
+      },
+
+      handleCustomColorAction() {
+        if (this.state.customColorUnlocked) {
+          this.state.theme = 'custom';
+          this.applyThemeVariables();
+          this.saveState();
+          this.renderAll();
+          this.showToast('КАСТОМНЫЙ ЦВЕТ АКТИВИРОВАН ✓');
+        } else {
+          this.buyWithTelegramStars('custom_theme_color');
+        }
+      },
+
+      // =====================================================
+      // FINANCE TRACKER ("КАПИТАЛ")
+      // =====================================================
+
+      setFinType(type) {
+        Haptics.impact('light');
+        this.finType = type;
+        this.finCategory = FIN_CATEGORIES[type][0];
+        this.renderFinance();
+      },
+
+      selectFinCategory(cat) {
+        Haptics.impact('light');
+        this.finCategory = cat;
+        this.renderFinance();
+      },
+
+      addTransaction() {
+        const amountInput = document.getElementById('fin-amount-input');
+        const noteInput = document.getElementById('fin-note-input');
+        const amount = Math.round(Number(amountInput.value));
+
+        if (!amount || amount <= 0) {
+          Haptics.notify('warning');
+          this.showToast('ВВЕДИ КОРРЕКТНУЮ СУММУ В ₽');
+          return;
+        }
+
+        const today = this.getTodayISO();
+        this.state.finance.transactions.unshift({
+          id: 'tx_' + Date.now(),
+          type: this.finType,
+          amount,
+          category: this.finCategory,
+          note: (noteInput.value || '').trim(),
+          date: today
+        });
+
+        amountInput.value = '';
+        noteInput.value = '';
+
+        // Daily Financial Discipline Reward (+15 ⚡ once per day)
+        let bonusMsg = '';
+        if (this.state.finance.lastAuditRewardDate !== today) {
+          this.state.finance.lastAuditRewardDate = today;
+          this.state.lockedCoins = (this.state.lockedCoins || 0) + 15;
+          this.recalculateCoins();
+          bonusMsg = ' // БОНУС УЧЕТА +15⚡!';
+        }
+
+        SoundFX.play('coin');
+        Haptics.notify('success');
+        this.saveState();
+        this.renderAll();
+        this.showToast(`ОПЕРАЦИЯ ЗАПИСАНА${bonusMsg}`);
+      },
+
+      deleteTransaction(id) {
+        this.state.finance.transactions = this.state.finance.transactions.filter(t => t.id !== id);
+        Haptics.impact('light');
+        this.saveState();
+        this.renderFinance();
+      },
+
+      editFinanceLimits() {
+        const newGoalTitle = prompt('Название финансовой цели:', this.state.finance.goalTitle || 'ФИНАНСОВАЯ ПОДУШКА');
+        if (newGoalTitle !== null && newGoalTitle.trim()) {
+          this.state.finance.goalTitle = newGoalTitle.trim().toUpperCase();
+        }
+        const newGoalTarget = prompt('Целевая сумма накоплений (₽):', this.state.finance.goalTarget || 50000);
+        if (newGoalTarget !== null && Number(newGoalTarget) > 0) {
+          this.state.finance.goalTarget = Math.round(Number(newGoalTarget));
+        }
+        const newDailyLimit = prompt('Дневной лимит расходов (₽):', this.state.finance.dailyLimit || 1500);
+        if (newDailyLimit !== null && Number(newDailyLimit) > 0) {
+          this.state.finance.dailyLimit = Math.round(Number(newDailyLimit));
+        }
+        this.saveState();
+        this.renderFinance();
+        this.showToast('ФИНАНСОВЫЕ ПАРАМЕТРЫ ОБНОВЛЕНЫ');
+      },
+
+      renderFinance() {
+        const fin = this.state.finance;
+        const today = this.getTodayISO();
+
+        let totalInc = 0;
+        let totalExp = 0;
+        let todayExp = 0;
+
+        fin.transactions.forEach(t => {
+          if (t.type === 'income') totalInc += t.amount;
+          else {
+            totalExp += t.amount;
+            if (t.date === today) todayExp += t.amount;
+          }
+        });
+
+        const net = totalInc - totalExp;
+        document.getElementById('fin-net-balance').textContent = `${net.toLocaleString('ru-RU')} ₽`;
+        document.getElementById('fin-total-income').textContent = `+${totalInc.toLocaleString('ru-RU')} ₽`;
+        document.getElementById('fin-total-expense').textContent = `-${totalExp.toLocaleString('ru-RU')} ₽`;
+
+        const auditDoneToday = fin.lastAuditRewardDate === today;
+        const auditBadge = document.getElementById('fin-audit-bonus-badge');
+        auditBadge.textContent = auditDoneToday ? '✓ БОНУС +15⚡ ПОЛУЧЕН' : 'УЧЕТ ДНЯ: +15 ⚡';
+        auditBadge.className = auditDoneToday
+          ? 'inline-block px-2 py-0.5 rounded bg-cyber-emerald/15 border border-cyber-emerald/40 text-cyber-emerald text-[9px] font-bold'
+          : 'inline-block px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold text-[9px] font-bold';
+
+        // Goal Bar
+        const target = Math.max(1, fin.goalTarget || 50000);
+        const goalPct = Math.max(0, Math.min(100, Math.round((Math.max(0, net) / target) * 100)));
+        document.getElementById('fin-goal-title').textContent = fin.goalTitle || 'КАПИТАЛ';
+        document.getElementById('fin-goal-progress-label').textContent = `${Math.max(0, net).toLocaleString('ru-RU')} / ${target.toLocaleString('ru-RU')} ₽`;
+        document.getElementById('fin-goal-pct').textContent = `${goalPct}%`;
+        document.getElementById('fin-goal-bar').style.width = `${goalPct}%`;
+
+        // Daily Limit Radar
+        const dLimit = Math.max(1, fin.dailyLimit || 1500);
+        const dPct = Math.min(100, Math.round((todayExp / dLimit) * 100));
+        const overLimit = todayExp > dLimit;
+        const limitLabel = document.getElementById('fin-daily-limit-label');
+        const dailyBar = document.getElementById('fin-daily-bar');
+
+        limitLabel.textContent = `${todayExp.toLocaleString('ru-RU')} / ${dLimit.toLocaleString('ru-RU')} ₽ ${overLimit ? '(ПЕРЕРАСХОД!)' : ''}`;
+        limitLabel.className = `font-bold ${overLimit ? 'text-cyber-crimson' : 'text-cyber-emerald'}`;
+        dailyBar.style.width = `${dPct}%`;
+        dailyBar.className = `h-full rounded-full transition-all duration-500 ${overLimit ? 'bg-cyber-crimson' : 'bg-cyber-emerald'}`;
+
+        // Toggle buttons
+        document.getElementById('fin-type-exp').className = `px-2.5 py-1 rounded-md font-bold transition ${this.finType === 'expense' ? 'bg-cyber-crimson text-white' : 'text-slate-400'}`;
+        document.getElementById('fin-type-inc').className = `px-2.5 py-1 rounded-md font-bold transition ${this.finType === 'income' ? 'bg-cyber-emerald text-black' : 'text-slate-400'}`;
+
+        // Category pills
+        const cats = FIN_CATEGORIES[this.finType] || [];
+        document.getElementById('fin-categories-row').innerHTML = cats.map(c => `
+          <button onclick="App.selectFinCategory('${c}')" 
+            class="px-2.5 py-1 rounded-lg font-mono text-[10px] border transition ${
+              this.finCategory === c 
+                ? 'bg-cyber-cyan/20 border-cyber-cyan text-cyber-cyan font-bold' 
+                : 'bg-slate-900 border-cyber-border text-slate-400'
+            }">
+            ${c}
+          </button>
+        `).join('');
+
+        // Transactions List
+        document.getElementById('fin-tx-count').textContent = `${fin.transactions.length} записей`;
+        const txList = document.getElementById('fin-tx-list');
+        if (fin.transactions.length === 0) {
+          txList.innerHTML = `<div class="text-center py-4 text-[11px] font-mono text-slate-400">Записей пока нет. Добавь первую операцию, чтобы получить +15⚡!</div>`;
+        } else {
+          txList.innerHTML = fin.transactions.slice(0, 30).map(tx => `
+            <div class="bg-slate-900/80 border border-cyber-border rounded-xl p-2.5 flex items-center justify-between gap-2">
+              <div class="min-w-0">
+                <div class="text-xs font-mono font-bold text-white truncate">${tx.category} ${tx.note ? `• <span class="text-slate-400 font-normal">${tx.note}</span>` : ''}</div>
+                <div class="text-[9px] font-mono text-slate-400">${tx.date}</div>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 font-mono">
+                <span class="text-xs font-bold ${tx.type === 'income' ? 'text-cyber-emerald' : 'text-cyber-crimson'}">
+                  ${tx.type === 'income' ? '+' : '-'}${tx.amount.toLocaleString('ru-RU')} ₽
+                </span>
+                <button onclick="App.deleteTransaction('${tx.id}')" class="text-slate-500 hover:text-cyber-crimson text-xs px-1">✕</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      },
+
+      // =====================================================
+      // CORE ECONOMY & STAGE LOGIC
+      // =====================================================
+
       getStageInfo(day) {
         if (day >= 90) return { stage: 5, title: 'ТИТАН', primary: '#fcee0a', secondary: '#ff003c' };
         if (day >= 61) return { stage: 4, title: 'МОНАХ', primary: '#ff003c', secondary: '#00f0ff' };
@@ -924,7 +1435,6 @@
         return { stage: 1, title: 'СПЯЩИЙ', primary: '#64748b', secondary: '#1e293b' };
       },
 
-      // FIX #5: Strict deterministic coin balance calculation based on active habits
       recalculateCoins() {
         const activeCheckedCoins = this.state.habits.filter(h => h.done).length * 10;
         const totalEarned = (this.state.lockedCoins || 0) + activeCheckedCoins;
@@ -945,7 +1455,6 @@
         const yesterday = this.getYesterdayISO();
 
         if (this.state.lastResetDate && this.state.lastResetDate !== today) {
-          // Commit yesterday's checked habits into lockedCoins before resetting checkboxes
           const yesterdayCheckedCoins = this.state.habits.filter(h => h.done).length * 10;
           this.state.lockedCoins = (this.state.lockedCoins || 0) + yesterdayCheckedCoins;
 
@@ -971,7 +1480,73 @@
       },
 
       // =====================================================
-      // MONETIZATION, CLAN CREATION (200⭐), PRO MONTHLY & SHOP PREVIEW
+      // CLAN CREATION LICENSE (200⭐ ONCE), KICK & DISBAND/LEAVE
+      // =====================================================
+
+      handleCreateClanClick() {
+        const clanInput = document.getElementById('create-clan-name-input');
+        const desiredName = (clanInput?.value || '').trim().toUpperCase();
+        if (!desiredName) {
+          Haptics.notify('warning');
+          this.showToast('ВВЕДИ НАЗВАНИЕ КЛАНА');
+          clanInput?.focus();
+          return;
+        }
+
+        // If user already bought Clan License in the past, create Clan for FREE!
+        if (this.state.clanLicenseOwned) {
+          this.state.hasClan = true;
+          this.state.isClanOwner = true;
+          this.state.clanName = desiredName;
+          clanInput.value = '';
+          SoundFX.play('powerup');
+          Haptics.notify('success');
+          this.saveState();
+          this.renderAll();
+          this.showToast(`🔥 КЛАН «${desiredName}» АКТИВИРОВАН ПО ТВОЕЙ ЛИЦЕНЗИИ!`);
+        } else {
+          this.buyWithTelegramStars('create_clan');
+        }
+      },
+
+      kickClanMember(memberId) {
+        if (!this.state.isClanOwner) return;
+        const target = this.state.clanMembers.find(m => m.id === memberId);
+        if (!target) return;
+
+        if (!confirm(`Исключить участника ${target.name} из клана?`)) return;
+        this.state.clanMembers = this.state.clanMembers.filter(m => m.id !== memberId);
+        Haptics.impact('medium');
+        this.saveState();
+        this.renderClan();
+        this.showToast(`УЧАСТНИК ${target.name} ИСКЛЮЧЕН ИЗ КЛАНА`);
+      },
+
+      leaveOrDisbandClan() {
+        if (this.state.isClanOwner) {
+          if (!confirm(`Распустить клан «${this.state.clanName}»? Твоя лицензия создателя за 200⭐ сохранится навсегда — ты сможешь создать новый клан бесплатно.`)) return;
+          this.state.hasClan = false;
+          this.state.clanName = '';
+          this.state.clanMembers = [];
+          Haptics.notify('warning');
+          this.saveState();
+          this.renderAll();
+          this.showToast('КЛАН РАСПУЩЕН. ЛИЦЕНЗИЯ СОЗДАТЕЛЯ СОХРАНЕНА ✓');
+        } else {
+          if (!confirm(`Выйти из клана «${this.state.clanName}»?`)) return;
+          this.state.hasClan = false;
+          this.state.isClanOwner = false;
+          this.state.clanName = '';
+          this.state.clanMembers = [];
+          Haptics.notify('warning');
+          this.saveState();
+          this.renderAll();
+          this.showToast('ТЫ ПОКИНУЛ КЛАН');
+        }
+      },
+
+      // =====================================================
+      // TELEGRAM STARS GATEWAY & SHOP PREVIEW
       // =====================================================
 
       buyWithTelegramStars(itemId) {
@@ -990,21 +1565,20 @@
           }
           typeLabel = 'ЕЖЕМЕСЯЧНАЯ ПОДПИСКА (30 ДНЕЙ)';
           title = 'ПОДПИСКА «ТИТАН PRO»';
-          desc = 'Снимает лимит в 4 привычки, выдает Неоновые крылья и +2 заморозки каждый месяц.';
+          desc = 'Снимает лимит в 4 привычки, выдает Неоновые крылья и +2 заморозки.';
           priceText = '150 ⭐ / МЕСЯЦ';
         } else if (itemId === 'create_clan') {
           const clanInput = document.getElementById('create-clan-name-input');
           const desiredName = (clanInput?.value || '').trim();
-          if (!desiredName) {
-            Haptics.notify('warning');
-            this.showToast('ВВЕДИ НАЗВАНИЕ КЛАНА ПЕРЕД СОЗДАНИЕМ');
-            clanInput?.focus();
-            return;
-          }
-          typeLabel = 'РАЗОВАЯ ПОКУПКА // СОЗДАНИЕ КЛАНА';
+          typeLabel = 'ЛИЦЕНЗИЯ СОЗДАТЕЛЯ КЛАНА (НАВСЕГДА)';
           title = `КЛАН «${desiredName.toUpperCase()}»`;
-          desc = 'Открывает лидерборд сквада, реферальные инвайты и механику пинков друзей.';
+          desc = 'Дает вечное право создавать и пересоздавать собственный клан без повторной оплаты.';
           priceText = '200 ⭐ (РАЗОВО)';
+        } else if (itemId === 'custom_theme_color') {
+          typeLabel = 'РАЗОВАЯ РАЗБЛОКИРОВКА // CHROMA RGB';
+          title = 'СВОЙ HEX-ЦВЕТ ИНТЕРФЕЙСА';
+          desc = 'Позволяет менять цвет неона всего приложения на любой оттенок без ограничений.';
+          priceText = '50 ⭐ (РАЗОВО)';
         } else if (itemId === 'streak_freeze') {
           if (this.state.streakFreezes >= 5) {
             this.showToast('МАКСИМУМ 5 КРИО-ЗАМОРОЗОК В ЗАПАСЕ');
@@ -1033,6 +1607,8 @@
 
       closeStarsModal() {
         Haptics.impact('light');
+        // Revert custom color preview if user canceled Stars modal
+        this.applyThemeVariables();
         document.getElementById('stars-invoice-modal').classList.add('hidden');
       },
 
@@ -1049,14 +1625,21 @@
           }
           this.state.equipped.wings = 'wings_neon';
           this.previewItemId = null;
-          this.showToast('⭐ ПОДПИСКА ТИТАН PRO ОФОРМЛЕНА НА 30 ДНЕЙ!');
+          this.showToast('⭐ ПОДПИСКА ТИТАН PRO АКТИВИРОВАНА!');
         } else if (itemId === 'create_clan') {
           const clanInput = document.getElementById('create-clan-name-input');
           const desiredName = (clanInput?.value || 'WINTER SQUAD').trim().toUpperCase();
+          this.state.clanLicenseOwned = true;
+          this.state.isClanOwner = true;
           this.state.hasClan = true;
           this.state.clanName = desiredName;
           if (clanInput) clanInput.value = '';
-          this.showToast(`🔥 КЛАН «${desiredName}» СОЗДАН! ПРИГЛАШАЙ ДРУЗЕЙ`);
+          this.showToast(`🔥 ЛИЦЕНЗИЯ ПОЛУЧЕНА! КЛАН «${desiredName}» СОЗДАН`);
+        } else if (itemId === 'custom_theme_color') {
+          this.state.customColorUnlocked = true;
+          this.state.theme = 'custom';
+          this.applyThemeVariables();
+          this.showToast('🎨 КАСТОМНЫЙ RGB-ЦВЕТ РАЗБЛОКИРОВАН НАВСЕГДА!');
         } else if (itemId === 'streak_freeze') {
           this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
           this.showToast('❄️ +1 КРИО-ЗАМОРОЗКА ДОБАВЛЕНА!');
@@ -1082,22 +1665,21 @@
           this.showToast('МАКСИМУМ 5 ЗАМОРОЗОК В ИНВЕНТАРЕ');
           return;
         }
-        if (this.state.coins < 150) {
+        if (this.state.coins < 400) {
           Haptics.notify('error');
-          this.showToast('НУЖНО 150 ⚡ МОНЕТ ДИСЦИПЛИНЫ');
+          this.showToast(`НУЖНО 400 ⚡ МОНЕТ (У ТЕБЯ ${this.state.coins} ⚡)`);
           return;
         }
-        this.state.spentCoins = (this.state.spentCoins || 0) + 150;
+        this.state.spentCoins = (this.state.spentCoins || 0) + 400;
         this.state.streakFreezes += 1;
         this.recalculateCoins();
         SoundFX.play('powerup');
         Haptics.notify('success');
         this.saveState();
         this.renderAll();
-        this.showToast('❄️ КРИО-ЗАМОРОЗКА КУПЛЕНА ЗА 150⚡!');
+        this.showToast('❄️ КРИО-ЗАМОРОЗКА КУПЛЕНА ЗА 400⚡!');
       },
 
-      // FIX #4: Shop Try-On Preview Mechanic
       previewOrToggleCosmetic(itemId) {
         Haptics.impact('light');
         const item = SHOP_COSMETICS.find(i => i.id === itemId);
@@ -1106,7 +1688,6 @@
         const isOwned = this.state.ownedItems.includes(item.id) || (item.id === 'wings_neon' && this.state.isPro);
 
         if (isOwned) {
-          // Directly equip or unequip owned item
           this.previewItemId = null;
           if (this.state.equipped[item.slot] === item.id) {
             this.state.equipped[item.slot] = null;
@@ -1119,11 +1700,10 @@
           this.saveState();
           this.renderAll();
         } else {
-          // Activate temporary preview on Avatar
           this.previewItemId = item.id;
           this.renderAvatar();
           this.renderShop();
-          this.showToast(`👁 ПРИМЕРКА: ${item.title}`);
+          this.showToast(`👁 ПРИМЕРКА В ВИТРИНЕ: ${item.title}`);
         }
       },
 
@@ -1164,13 +1744,71 @@
         this.showToast(`⚡ КУПЛЕНО И НАДЕТО: ${item.title}!`);
       },
 
+      getProgressBarClasses(barSkinId) {
+        if (barSkinId === 'bar_cyber_gold') {
+          return {
+            name: 'КИСЛОТНОЕ ЗОЛОТО',
+            phase: 'h-full bg-gradient-to-r from-cyber-gold via-amber-400 to-cyber-emerald rounded-full transition-all duration-500 shadow-[0_0_10px_#fcee0a]',
+            day: 'h-full bg-gradient-to-r from-cyber-gold to-amber-500 rounded-full transition-all duration-500'
+          };
+        }
+        if (barSkinId === 'bar_crimson_overdrive') {
+          return {
+            name: 'БАГРОВЫЙ OVERDRIVE',
+            phase: 'h-full bg-gradient-to-r from-cyber-crimson via-fuchsia-600 to-cyber-gold rounded-full transition-all duration-500 shadow-[0_0_10px_#ff003c]',
+            day: 'h-full bg-gradient-to-r from-cyber-crimson to-orange-500 rounded-full transition-all duration-500'
+          };
+        }
+        return {
+          name: 'СТАНДАРТ',
+          phase: 'h-full bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-gold rounded-full transition-all duration-500',
+          day: 'h-full bg-gradient-to-r from-emerald-500 to-cyber-emerald rounded-full transition-all duration-500'
+        };
+      },
+
       renderShop() {
         this.recalculateCoins();
         document.getElementById('shop-coins').textContent = this.state.coins;
         document.getElementById('shop-freezes').textContent = this.state.streakFreezes;
         document.getElementById('freeze-stock-badge').textContent = this.state.streakFreezes;
 
-        // Render PRO Subscription button state
+        // Theme buttons state
+        ['blue', 'red', 'white'].forEach(t => {
+          const btn = document.getElementById(`theme-btn-${t}`);
+          if (btn) {
+            btn.className = `py-2.5 px-2 rounded-xl border font-bold flex flex-col items-center gap-1 active:scale-95 transition ${
+              this.state.theme === t ? 'border-cyber-cyan bg-cyber-cyan/15 text-white' : 'border-cyber-border bg-slate-900 text-slate-400'
+            }`;
+          }
+        });
+
+        const colorPicker = document.getElementById('custom-theme-color-picker');
+        if (colorPicker && this.state.customColorHex) {
+          colorPicker.value = this.state.customColorHex;
+        }
+        const customColorBtn = document.getElementById('btn-custom-color-action');
+        const customColorStatus = document.getElementById('custom-color-status-text');
+        if (this.state.customColorUnlocked) {
+          customColorStatus.textContent = 'Разблокировано навсегда ✓ Меняй палитру слева';
+          customColorBtn.textContent = this.state.theme === 'custom' ? '✓ АКТИВЕН' : 'ВКЛЮЧИТЬ';
+          customColorBtn.className = 'px-3 py-2 rounded-xl bg-cyber-emerald text-black font-mono text-[10px] font-black uppercase';
+        } else {
+          customColorStatus.textContent = 'Выбери любой оттенок палитрой // 50 ⭐';
+          customColorBtn.textContent = '⭐ 50 STARS';
+          customColorBtn.className = 'px-3 py-2 rounded-xl bg-cyber-gold/20 border border-cyber-gold text-cyber-gold font-mono text-[10px] font-black uppercase active:scale-95';
+        }
+
+        // Update Shop Progress-Bar Live Preview
+        const previewEq = { ...(this.state.equipped || {}) };
+        const previewItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
+        if (previewItem) previewEq[previewItem.slot] = previewItem.id;
+
+        const barStyles = this.getProgressBarClasses(previewEq.progressbar);
+        document.getElementById('shop-bar-skin-label').textContent = barStyles.name;
+        document.getElementById('shop-preview-phase-bar').className = barStyles.phase;
+        document.getElementById('shop-preview-day-bar').className = barStyles.day;
+
+        // PRO status
         const proActions = document.getElementById('pro-buy-actions');
         if (this.state.isPro) {
           proActions.innerHTML = `
@@ -1180,10 +1818,9 @@
           `;
         }
 
-        // Render Preview Action Bar
+        // Preview Action Bar
         const previewBar = document.getElementById('shop-preview-action-bar');
         const previewStatus = document.getElementById('shop-preview-status');
-        const previewItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
 
         if (previewItem) {
           previewBar.classList.remove('hidden');
@@ -1199,7 +1836,6 @@
           previewStatus.className = 'text-slate-400';
         }
 
-        // Render Cosmetics Cards
         const list = document.getElementById('shop-cosmetics-list');
         list.innerHTML = SHOP_COSMETICS.map(item => {
           const isOwned = this.state.ownedItems.includes(item.id) || (item.id === 'wings_neon' && this.state.isPro);
@@ -1230,7 +1866,7 @@
                 </button>
                 <button onclick="App.buyPreviewedCosmetic('${item.id}')" 
                   class="px-3 py-2 rounded-xl font-mono text-[10px] font-black uppercase bg-cyber-gold/20 border border-cyber-gold text-cyber-gold active:scale-95">
-                  КУПИТЬ (${item.badge})
+                  ${item.badge}
                 </button>
               </div>
             `;
@@ -1239,6 +1875,7 @@
           return `
             <div class="bg-cyber-card border ${isPreviewing ? 'border-cyber-gold' : isEquipped ? 'border-cyber-emerald/60' : 'border-cyber-border'} rounded-2xl p-3.5 flex items-center justify-between gap-2.5 transition">
               <div class="min-w-0">
+                <div class="text-[9px] font-mono text-cyber-cyan uppercase">${item.tier}</div>
                 <div class="text-xs font-mono font-bold text-white truncate">${item.title}</div>
                 <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${item.desc}</p>
               </div>
@@ -1249,7 +1886,7 @@
       },
 
       // =====================================================
-      // HABITS & ANTI-HABITS (FIX #2 & #5: CLEAN INIT, PRO LIMITS, NO COIN EXPLOIT)
+      // HABITS & ANTI-HABITS
       // =====================================================
 
       toggleHabit(id) {
@@ -1257,7 +1894,6 @@
         if (!habit) return;
 
         if (habit.done) {
-          // User wants to uncheck (true -> false): verify they haven't spent those 10 coins already
           this.recalculateCoins();
           if (this.state.coins < 10) {
             Haptics.notify('error');
@@ -1270,7 +1906,6 @@
           Haptics.impact('light');
           this.showToast('ОТМЕТКА СНЯТА // -10 ⚡');
         } else {
-          // false -> true (+10 coins strictly bound to checked state)
           habit.done = true;
           this.recalculateCoins();
           SoundFX.play('coin');
@@ -1363,11 +1998,7 @@
       },
 
       addPresetHabit(cat, idx) {
-        if (this.isHabitLimitReached()) {
-          Haptics.notify('warning');
-          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. ОФОРМИ ТИТАН PRO!');
-          return;
-        }
+        if (this.isHabitLimitReached()) return;
         const item = HABIT_CATALOG[cat]?.[idx];
         if (!item) return;
 
@@ -1383,15 +2014,11 @@
         this.saveState();
         this.selectCatalogCategory(cat);
         this.renderAll();
-        this.showToast('ПРИВЫЧКА ДОБАВЛЕНА В ПРОТОКОЛ');
+        this.showToast('ПРИВЫЧКА ДОБАВЛЕНА');
       },
 
       addCustomHabit() {
-        if (this.isHabitLimitReached()) {
-          Haptics.notify('warning');
-          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. ОФОРМИ ТИТАН PRO!');
-          return;
-        }
+        if (this.isHabitLimitReached()) return;
         const input = document.getElementById('custom-habit-input');
         const title = input.value.trim();
         if (!title) return;
@@ -1417,7 +2044,7 @@
           this.recalculateCoins();
           if (this.state.coins < 10) {
             Haptics.notify('error');
-            this.showToast('НЕЛЬЗЯ УДАЛИТЬ: МОНЕТЫ ЗА ЗАДАЧУ УЖЕ ПОТРАЧЕНЫ');
+            this.showToast('НЕЛЬЗЯ УДАЛИТЬ: МОНЕТЫ УЖЕ ПОТРАЧЕНЫ');
             return;
           }
         }
@@ -1494,15 +2121,15 @@
       repairShield() {
         this.recalculateCoins();
         if (!this.state.shieldCracked) {
-          this.showToast('ЭНЕРГЕТИЧЕСКИЙ ЩИТ УЖЕ В ПОЛНОЙ НОРМЕ');
+          this.showToast('ЭНЕРГЕТИЧЕСКИЙ ЩИТ УЖЕ В НОРМЕ');
           return;
         }
-        if (this.state.coins < 30) {
+        if (this.state.coins < 120) {
           Haptics.notify('error');
-          this.showToast('НУЖНО 30⚡ МОНЕТ ДЛЯ КАЛИБРОВКИ ЩИТА');
+          this.showToast('НУЖНО 120⚡ МОНЕТ ДЛЯ КАЛИБРОВКИ ЩИТА');
           return;
         }
-        this.state.spentCoins = (this.state.spentCoins || 0) + 30;
+        this.state.spentCoins = (this.state.spentCoins || 0) + 120;
         this.state.shieldCracked = false;
         this.recalculateCoins();
         SoundFX.play('powerup');
@@ -1550,7 +2177,7 @@
         if (this.state.day < 90) this.state.day += 1;
         this.state.lastCompletedDate = today;
 
-        const rewardCoins = this.state.isPro ? 60 : 30;
+        const rewardCoins = this.state.isPro ? 50 : 25;
         this.state.lockedCoins = (this.state.lockedCoins || 0) + rewardCoins;
         this.state.shieldCracked = false;
         this.recalculateCoins();
@@ -1563,7 +2190,7 @@
       },
 
       // =====================================================
-      // CLAN & P2P REFERRAL ENGINE (FIX #3: NO FAKE USERS)
+      // CLAN REFERRALS (NO BROKEN URLS — PURE REF CODE)
       // =====================================================
 
       generateMyRefToken() {
@@ -1604,10 +2231,10 @@
             return false;
           }
 
-          // Automatically activate Clan membership when joining via friend's referral
-          this.state.hasClan = true;
-          if (!this.state.clanName && data.c) {
-            this.state.clanName = String(data.c).toUpperCase();
+          if (!this.state.hasClan) {
+            this.state.hasClan = true;
+            this.state.isClanOwner = false;
+            this.state.clanName = data.c ? String(data.c).toUpperCase() : 'WINTER SQUAD';
           }
 
           const existing = this.state.clanMembers.find(m => m.name.toUpperCase() === cleanName);
@@ -1628,7 +2255,7 @@
           this.saveState();
           this.renderAll();
           Haptics.notify('success');
-          this.showToast(`🔥 ОПЕРАТОР ${cleanName} ДОБАВЛЕН В КЛАН!`);
+          this.showToast(`🔥 ОПЕРАТОР ${cleanName} СИНХРОНИЗИРОВАН!`);
           return true;
         } catch (e) {
           return false;
@@ -1638,11 +2265,10 @@
       joinClanByRefInput() {
         const input = document.getElementById('join-clan-ref-input');
         const ok = this.processRefToken(input?.value || '');
-        if (ok) {
-          input.value = '';
-        } else {
+        if (ok) input.value = '';
+        else {
           Haptics.notify('error');
-          this.showToast('ВВЕДИ КОРРЕКТНЫЙ REF_ КОД ИЛИ ССЫЛКУ ДРУГА');
+          this.showToast('ВВЕДИ КОРРЕКТНЫЙ REF_ КОД ДРУГА');
         }
       },
 
@@ -1657,12 +2283,13 @@
         }
       },
 
+      // Clean Ref-Code Share (No broken links)
       shareClanInvite() {
         Haptics.impact('medium');
         const refToken = this.generateMyRefToken();
         const myInfo = this.getStageInfo(this.state.day);
-        const text = `⚡ Вступай в наш Клан «${this.state.clanName || 'WINTER SQUAD'}» в PROJECT 90! Мой Аватар на стадии «${myInfo.title}» (Ур. ${myInfo.stage}, Стрик: ${this.state.streak}🔥).\n\nСкопируй мой код для входа: ${refToken}`;
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/?startapp=${refToken}`)}&text=${encodeURIComponent(text)}`;
+        const text = `\n⚡ Вступай в наш Клан «${this.state.clanName || 'WINTER SQUAD'}» в PROJECT 90!\nМой Аватар: Ур. ${myInfo.stage} «${myInfo.title}» (Стрик: ${this.state.streak}🔥).\n\nСкопируй этот ref-код и вставь во вкладке «Клан»:`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refToken)}&text=${encodeURIComponent(text)}`;
 
         if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
         else window.open(shareUrl, '_blank');
@@ -1695,15 +2322,15 @@
         Haptics.impact('heavy');
         const myInfo = this.getStageInfo(this.state.day);
         const refToken = this.generateMyRefToken();
-        const text = `⚡ Мой аватар уже на ${myInfo.stage} уровне, а ты еще не закрыл задачи за сегодня! Не сливай стрик! (${friendName}, жду отчет в PROJECT 90 // Код синхронизации: ${refToken})`;
-        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent('https://t.me/')}&text=${encodeURIComponent(text)}`;
+        const text = `\n⚡ Йо, ${friendName}! Мой аватар уже на ${myInfo.stage} уровне, а ты еще не закрыл задачи за сегодня! Не сливай стрик!\n\nМой код синхронизации:`;
+        const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(refToken)}&text=${encodeURIComponent(text)}`;
 
         if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
         else window.open(shareUrl, '_blank');
       },
 
       // =====================================================
-      // AVATAR SVG GENERATOR (FIX #4: CENTERED & SUPPORTS TRY-ON PREVIEW)
+      // AVATAR & UI RENDERERS
       // =====================================================
 
       buildAvatarSVG(usePreview = false, sizeClass = 'w-44 h-44') {
@@ -1711,7 +2338,6 @@
         const cracked = this.state.shieldCracked;
         const info = this.getStageInfo(day);
 
-        // Merge equipped state with temporary shop preview if active
         const eq = { ...(this.state.equipped || {}) };
         if (usePreview && this.previewItemId) {
           const pItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
@@ -1719,10 +2345,19 @@
         }
 
         const hasSamuraiAura = eq.aura === 'aura_samurai';
+        const hasSingularityAura = eq.aura === 'aura_singularity';
         const hasNeonWings = eq.wings === 'wings_neon';
         const hasGhostSkin = eq.skin === 'skin_ghost';
 
-        const primaryColor = cracked ? '#ff003c' : hasSamuraiAura ? '#ff003c' : hasGhostSkin ? '#00ff66' : info.primary;
+        const primaryColor = cracked
+          ? '#ff003c'
+          : hasSingularityAura
+          ? '#fcee0a'
+          : hasSamuraiAura
+          ? '#ff003c'
+          : hasGhostSkin
+          ? '#00ff66'
+          : info.primary;
         const bodyFill = hasGhostSkin ? 'rgba(15, 23, 42, 0.55)' : '#0b0f19';
 
         const wingsSVG = hasNeonWings ? `
@@ -1740,6 +2375,13 @@
           </g>
         ` : '';
 
+        const singularityAuraSVG = hasSingularityAura ? `
+          <g class="animate-spin-slow svg-origin-center">
+            <circle cx="100" cy="100" r="85" fill="none" stroke="#fcee0a" stroke-width="2.5" stroke-dasharray="12 6" />
+            <circle cx="100" cy="100" r="76" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="25 10" />
+          </g>
+        ` : '';
+
         const shieldLayerSVG = cracked ? `
           <g opacity="0.9">
             <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(255,0,60,0.08)" stroke="#ff003c" stroke-width="2" stroke-dasharray="18 8 4 8" />
@@ -1747,7 +2389,7 @@
           </g>
         ` : `
           <g class="animate-shield">
-            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.05)" stroke="#00f0ff" stroke-width="1.6" opacity="0.85" />
+            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.05)" stroke="var(--accent-main)" stroke-width="1.6" opacity="0.85" />
           </g>
         `;
 
@@ -1762,6 +2404,7 @@
             </defs>
             <circle cx="100" cy="100" r="76" fill="url(#avatarGrad_${usePreview ? 'shop' : 'main'})" />
             ${samuraiAuraSVG}
+            ${singularityAuraSVG}
             ${wingsSVG}
             ${info.stage >= 3 ? `<g class="animate-spin-slow svg-origin-center"><circle cx="100" cy="100" r="68" fill="none" stroke="${primaryColor}" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.8" /></g>` : ''}
             ${info.stage === 5 || this.state.isPro ? `<ellipse cx="100" cy="34" rx="28" ry="7" fill="none" stroke="#fcee0a" stroke-width="2.5" class="animate-pulse" />` : ''}
@@ -1778,36 +2421,28 @@
         const cracked = this.state.shieldCracked;
         const info = this.getStageInfo(day);
         const eq = { ...(this.state.equipped || {}) };
-        if (this.previewItemId) {
-          const pItem = SHOP_COSMETICS.find(i => i.id === this.previewItemId);
-          if (pItem) eq[pItem.slot] = pItem.id;
-        }
 
         document.getElementById('avatar-stage-title').textContent = `${info.title} (УР. ${info.stage})`;
         document.getElementById('current-day-label').textContent = day;
         document.getElementById('avatar-level').textContent = info.stage;
 
+        const barStyles = this.getProgressBarClasses(eq.progressbar);
         const phaseBar = document.getElementById('phase-bar');
         const dayBar = document.getElementById('day-bar');
-        if (eq.progressbar === 'bar_cyber_gold') {
-          phaseBar.className = 'h-full bg-gradient-to-r from-cyber-gold via-amber-400 to-cyber-emerald rounded-full transition-all duration-500 shadow-[0_0_10px_#fcee0a]';
-          dayBar.className = 'h-full bg-gradient-to-r from-cyber-gold to-amber-500 rounded-full transition-all duration-500';
-        } else {
-          phaseBar.className = 'h-full bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-gold rounded-full transition-all duration-500';
-          dayBar.className = 'h-full bg-gradient-to-r from-emerald-500 to-cyber-emerald rounded-full transition-all duration-500';
-        }
+        phaseBar.className = barStyles.phase;
+        dayBar.className = barStyles.day;
 
         const cardBox = document.getElementById('avatar-card-box');
         const shieldBadge = document.getElementById('shield-badge');
         const repairBtn = document.getElementById('btn-repair-shield');
 
         if (cracked) {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-[#1a0b12] to-[#080a10] neon-border-crimson p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-cyber-card neon-border-crimson p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-crimson/20 text-cyber-crimson border border-cyber-crimson text-[9px] font-bold mt-0.5 animate-pulse';
           shieldBadge.innerHTML = '<span>⚠️ ЩИТ ПРОБИТ</span>';
           repairBtn.classList.remove('hidden');
         } else {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-cyber-card neon-border-cyan p-4 flex flex-col items-center justify-between overflow-hidden min-h-[290px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 text-[9px] font-bold mt-0.5';
           shieldBadge.innerHTML = '<span>🛡 ЩИТ АКТИВЕН</span>';
           repairBtn.classList.add('hidden');
@@ -1828,7 +2463,6 @@
         document.getElementById('phase-xp-text').textContent = phaseText;
         phaseBar.style.width = `${phasePercent}%`;
 
-        // Render both Hero Avatar and Shop Mannequin Avatar
         document.getElementById('avatar-container').innerHTML = this.buildAvatarSVG(false, 'w-44 h-44');
         const shopPreviewBox = document.getElementById('shop-avatar-preview-box');
         if (shopPreviewBox) {
@@ -1849,7 +2483,6 @@
           ? `ПОДПИСКА PRO: ${total} ПРИВЫЧЕК (БЕЗЛИМИТ)`
           : `Добавлено: ${total}/4 привычек (PRO — безлимит)`;
 
-        // Lock "+ Каталог идей" button visually if non-PRO reached 4 habits
         const openCatBtn = document.getElementById('btn-open-catalog');
         const openCatText = document.getElementById('btn-open-catalog-text');
         if (this.isHabitLimitReached()) {
@@ -1923,7 +2556,7 @@
           list.innerHTML = `
             <div class="bg-cyber-card/70 border border-dashed border-cyber-border rounded-2xl p-6 text-center">
               <div class="text-xs font-mono font-bold text-white uppercase mb-1">Нет активных таймеров отказа</div>
-              <p class="text-[11px] text-slate-400">Введи вредную привычку выше (например, «Без сахара» или «Без курения») и нажми СТАРТ, чтобы запустить живой отсчет чистоты.</p>
+              <p class="text-[11px] text-slate-400">Введи вредную привычку выше и нажми СТАРТ, чтобы запустить живой отсчет чистоты.</p>
             </div>
           `;
           return;
@@ -1980,7 +2613,22 @@
         const emptyView = document.getElementById('clan-empty-view');
         const activeView = document.getElementById('clan-active-view');
 
-        if (!this.state.hasClan && this.state.clanMembers.length === 0) {
+        // Update Create Clan button if user already owns the 200⭐ license
+        const licenseLabel = document.getElementById('clan-license-label');
+        const createBtn = document.getElementById('btn-create-clan-main');
+        if (this.state.clanLicenseOwned) {
+          licenseLabel.textContent = '✓ ЛИЦЕНЗИЯ СОЗДАТЕЛЯ КЛАНА АКТИВНА (БЕЗ ПОВТОРНОЙ ОПЛАТЫ):';
+          licenseLabel.className = 'text-[10px] font-mono text-cyber-emerald uppercase font-bold';
+          createBtn.innerHTML = '<span>⚡ СОЗДАТЬ НОВЫЙ КЛАН БЕСПЛАТНО (ПО ЛИЦЕНЗИИ)</span>';
+          createBtn.className = 'w-full py-3 rounded-xl bg-cyber-emerald text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-1.5 active:scale-98 transition';
+        } else {
+          licenseLabel.textContent = 'Создание своего Клана (Разовая покупка лицензии):';
+          licenseLabel.className = 'text-[10px] font-mono text-cyber-gold uppercase font-bold';
+          createBtn.innerHTML = '<span>⭐ СОЗДАТЬ КЛАН ЗА 200 STARS (РАЗОВО)</span>';
+          createBtn.className = 'w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-1.5 active:scale-98 transition';
+        }
+
+        if (!this.state.hasClan) {
           emptyView.classList.remove('hidden');
           activeView.classList.add('hidden');
           return;
@@ -1990,6 +2638,11 @@
         activeView.classList.remove('hidden');
 
         document.getElementById('active-clan-title').textContent = this.state.clanName || 'WINTER SQUAD';
+        document.getElementById('clan-role-badge').textContent = this.state.isClanOwner ? '👑 ВЛАДЕЛЕЦ КЛАНА' : 'БОЕЦ КЛАНА';
+        document.getElementById('btn-leave-clan').textContent = this.state.isClanOwner ? 'РАСПУСТИТЬ КЛАН' : 'ПОКИНУТЬ КЛАН';
+        document.getElementById('clan-manage-hint').textContent = this.state.isClanOwner
+          ? 'Ты владелец клана. Можешь исключать участников (✕) или распустить клан с сохранением лицензии 200⭐.'
+          : 'Ты состоишь в клане. Можешь выйти в любой момент.';
 
         const myDoneToday = this.state.habits.some(h => h.done) || this.state.lastCompletedDate === this.getTodayISO();
         const meEntry = {
@@ -2050,14 +2703,22 @@
                 </div>
               </div>
               ${!member.isMe ? `
-                <button onclick="App.nudgeFriend('${member.name}')" 
-                  class="shrink-0 px-2.5 py-2 rounded-xl font-mono text-[10px] font-black uppercase tracking-wider transition active:scale-95 ${
-                    member.doneToday 
-                      ? 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-cyber-cyan hover:text-cyber-cyan' 
-                      : 'bg-cyber-crimson/20 border border-cyber-crimson text-cyber-crimson shadow-[0_0_10px_rgba(255,0,60,0.25)] animate-pulse'
-                  }">
-                  ⚡ ПНУТЬ
-                </button>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button onclick="App.nudgeFriend('${member.name}')" 
+                    class="px-2.5 py-2 rounded-xl font-mono text-[10px] font-black uppercase tracking-wider transition active:scale-95 ${
+                      member.doneToday 
+                        ? 'bg-slate-900 border border-slate-700 text-slate-300' 
+                        : 'bg-cyber-crimson/20 border border-cyber-crimson text-cyber-crimson animate-pulse'
+                    }">
+                    ⚡ ПНУТЬ
+                  </button>
+                  ${this.state.isClanOwner ? `
+                    <button onclick="App.kickClanMember('${member.id}')" title="Исключить из клана"
+                      class="px-2 py-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-cyber-crimson font-mono text-xs">
+                      ✕
+                    </button>
+                  ` : ''}
+                </div>
               ` : ''}
             </div>
           `;
@@ -2090,9 +2751,9 @@
 
           let cellStyle = 'bg-slate-900/90 border border-slate-800 text-slate-500';
           if (isCompleted && isMilestone) {
-            cellStyle = 'bg-cyber-gold text-black font-black shadow-[0_0_10px_rgba(252,238,10,0.75)] border border-cyber-gold';
+            cellStyle = 'bg-cyber-gold text-black font-black border border-cyber-gold';
           } else if (isCompleted) {
-            cellStyle = 'bg-cyber-cyan text-black font-black shadow-[0_0_8px_rgba(0,240,255,0.55)] border border-cyber-cyan';
+            cellStyle = 'bg-cyber-cyan text-black font-black border border-cyber-cyan';
           } else if (isCurrent) {
             cellStyle = 'bg-cyber-crimson/25 border border-cyber-crimson text-white font-bold animate-pulse';
           }
@@ -2118,7 +2779,6 @@
         else this.showToast(`ДЕНЬ ${dayNum}/90 // ВПЕРЕДИ`);
       },
 
-      // FIX #1: Stacked Header Lines on Canvas so Title & Level never collide
       generateAndPreviewHeroCard() {
         Haptics.impact('heavy');
         SoundFX.play('coin');
@@ -2152,23 +2812,18 @@
         ctx.lineWidth = 5;
         ctx.strokeRect(48, 48, W - 96, H - 96);
 
-        // STACKED CENTERED HEADER (No Horizontal Collision Possible)
         const cx = 540;
         ctx.textAlign = 'center';
 
-        // Row 1: Main System Title
         ctx.fillStyle = '#00f0ff';
         ctx.font = 'bold 34px monospace';
         ctx.fillText('PROJECT 90 // WINTER ARC SYSTEM', cx, 125);
 
-        // Row 2: Operator Callsign
         ctx.fillStyle = '#94a3b8';
         ctx.font = '26px monospace';
         ctx.fillText(`ОПЕРАТОР: ${this.state.callsign} ${this.state.isPro ? '[PRO]' : ''}`, cx, 172);
 
-        // Row 3: Distinct Level Badge Pill on its own line
-        const badgeW = 460;
-        const badgeH = 54;
+        const badgeW = 460, badgeH = 54;
         ctx.fillStyle = '#111624';
         ctx.fillRect(cx - badgeW / 2, 198, badgeW, badgeH);
         ctx.strokeStyle = '#fcee0a';
@@ -2179,7 +2834,6 @@
         ctx.font = 'bold 28px monospace';
         ctx.fillText(`УР. ${info.stage} // ${info.title}`, cx, 235);
 
-        // Central Avatar (Center X: 540, Y: 630)
         const cy = 630;
         const radGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 320);
         radGrad.addColorStop(0, accent);
@@ -2412,6 +3066,7 @@
         this.renderAvatar();
         this.renderHabits();
         this.renderAntiHabits();
+        this.renderFinance();
         this.renderClan();
         this.renderStats();
         this.renderShop();
@@ -2419,14 +3074,13 @@
 
       switchTab(tab) {
         Haptics.impact('light');
-        // If leaving Shop without purchasing previewed item, revert Avatar to owned look
         if (tab !== 'shop' && this.previewItemId) {
           this.previewItemId = null;
           this.renderAvatar();
           this.renderShop();
         }
 
-        ['hero', 'antihabits', 'clan', 'stats', 'shop'].forEach(t => {
+        ['hero', 'antihabits', 'finance', 'clan', 'stats', 'shop'].forEach(t => {
           document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
           const btn = document.getElementById(`nav-${t}`);
           if (t === tab) {
@@ -2460,25 +3114,25 @@
           h = canvas.height = window.innerHeight;
         });
 
-        const particles = Array.from({ length: 30 }, () => ({
+        const particles = Array.from({ length: 28 }, () => ({
           x: Math.random() * w,
           y: Math.random() * h,
           vx: (Math.random() - 0.5) * 0.3,
           vy: -Math.random() * 0.45 - 0.1,
-          size: Math.random() * 2 + 0.5,
-          color: Math.random() > 0.25 ? '#00f0ff' : '#fcee0a'
+          size: Math.random() * 2 + 0.5
         }));
 
         function draw() {
           ctx.clearRect(0, 0, w, h);
+          const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent-main').trim() || '#00f0ff';
           for (const p of particles) {
             p.x += p.vx;
             p.y += p.vy;
             if (p.y < 0) p.y = h;
             if (p.x < 0) p.x = w;
             if (p.x > w) p.x = 0;
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = 0.4;
+            ctx.fillStyle = accent;
+            ctx.globalAlpha = 0.35;
             ctx.fillRect(p.x, p.y, p.size, p.size);
           }
           requestAnimationFrame(draw);
