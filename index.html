@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PROJECT 90 // PHASE 4 STATS & VIRAL ENGINE</title>
+  <title>PROJECT 90 // FULL RELEASE (PHASE 5)</title>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,7 +23,8 @@
               crimson: '#ff003c',
               gold: '#fcee0a',
               emerald: '#00ff66',
-              purple: '#a855f7'
+              purple: '#a855f7',
+              ice: '#38bdf8'
             }
           },
           fontFamily: {
@@ -67,6 +68,10 @@
       box-shadow: 0 0 15px rgba(168, 85, 247, 0.22), inset 0 0 12px rgba(168, 85, 247, 0.08);
       border: 1px solid rgba(168, 85, 247, 0.45);
     }
+    .neon-border-gold {
+      box-shadow: 0 0 18px rgba(252, 238, 10, 0.25), inset 0 0 12px rgba(252, 238, 10, 0.08);
+      border: 1px solid rgba(252, 238, 10, 0.55);
+    }
     @keyframes spin-slow {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
@@ -108,25 +113,35 @@
 
   <div id="app-shell" class="relative z-10 max-w-md mx-auto min-h-screen flex flex-col pb-28 px-4 pt-3">
 
-    <!-- HEADER: System Status & Currency -->
+    <!-- HEADER: System Status, Streak Freeze, Coins & Streak -->
     <header class="flex items-center justify-between py-2 px-3 rounded-xl bg-cyber-card/85 backdrop-blur-md border border-cyber-border mb-3">
-      <div class="flex items-center gap-2">
-        <div class="relative flex h-2.5 w-2.5">
+      <div class="flex items-center gap-2 min-w-0">
+        <div class="relative flex h-2.5 w-2.5 shrink-0">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyber-cyan opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-cyan"></span>
         </div>
-        <div>
-          <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400">PROJECT 90 // PHASE IV</div>
-          <div id="user-callsign" class="text-xs font-bold tracking-wider text-white font-mono">OPERATOR_01</div>
+        <div class="truncate">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-slate-400">PROJECT 90</span>
+            <span id="pro-header-badge" class="hidden px-1.5 py-0.2 rounded bg-cyber-gold text-black font-mono font-black text-[8px] uppercase">PRO</span>
+          </div>
+          <div id="user-callsign" class="text-xs font-bold tracking-wider text-white font-mono truncate">OPERATOR_01</div>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
-        <div class="flex items-center gap-1 bg-slate-900/90 border border-cyber-gold/40 px-2.5 py-1 rounded-lg">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <!-- Streak Freeze Counter (❄️) -->
+        <button onclick="App.switchTab('shop')" title="Крио-заморозка стрика" class="flex items-center gap-1 bg-slate-900/90 border border-cyber-ice/40 px-2 py-1 rounded-lg active:scale-95 transition">
+          <i data-lucide="snowflake" class="w-3.5 h-3.5 text-cyber-ice"></i>
+          <span id="header-freezes" class="font-mono font-bold text-xs text-cyber-ice">1</span>
+        </button>
+        <!-- Coins Balance (⚡) -->
+        <button onclick="App.switchTab('shop')" class="flex items-center gap-1 bg-slate-900/90 border border-cyber-gold/40 px-2 py-1 rounded-lg active:scale-95 transition">
           <i data-lucide="zap" class="w-3.5 h-3.5 text-cyber-gold fill-cyber-gold"></i>
           <span id="header-coins" class="font-mono font-bold text-xs text-cyber-gold">0</span>
-        </div>
-        <div class="flex items-center gap-1 bg-slate-900/90 border border-cyber-crimson/40 px-2.5 py-1 rounded-lg">
+        </button>
+        <!-- Streak Counter (🔥) -->
+        <div class="flex items-center gap-1 bg-slate-900/90 border border-cyber-crimson/40 px-2 py-1 rounded-lg">
           <i data-lucide="flame" class="w-3.5 h-3.5 text-cyber-crimson fill-cyber-crimson"></i>
           <span id="header-streak" class="font-mono font-bold text-xs text-white">0</span>
         </div>
@@ -140,7 +155,7 @@
       <div id="view-hero" class="space-y-4">
         
         <!-- AVATAR CARD -->
-        <div id="avatar-card-box" class="relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[275px] transition-all duration-300">
+        <div id="avatar-card-box" class="relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300">
           
           <div class="absolute top-2.5 left-3 text-[10px] font-mono text-cyber-cyan/70 leading-tight">
             СТАДИЯ: <span id="avatar-stage-title" class="text-white font-bold">СПЯЩИЙ</span><br>
@@ -154,7 +169,7 @@
             </div>
           </div>
 
-          <!-- Dynamic SVG Avatar + Energy Shield Layer -->
+          <!-- Dynamic SVG Avatar + Equipped Skins/Wings/Auras + Energy Shield -->
           <div id="avatar-container" class="my-3 animate-float relative flex items-center justify-center w-48 h-48"></div>
 
           <button id="btn-repair-shield" onclick="App.repairShield()" class="hidden mb-2 px-3 py-1 rounded-lg bg-cyber-crimson/20 border border-cyber-crimson text-[10px] font-mono font-bold text-cyber-crimson hover:bg-cyber-crimson hover:text-white transition">
@@ -188,13 +203,16 @@
         <!-- HABITS LIST FOR TODAY -->
         <div>
           <div class="flex items-center justify-between mb-2.5">
-            <h2 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
-              <i data-lucide="check-square" class="w-4 h-4 text-cyber-cyan"></i>
-              Привычки на сегодня
-            </h2>
+            <div>
+              <h2 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <i data-lucide="check-square" class="w-4 h-4 text-cyber-cyan"></i>
+                Привычки на сегодня
+              </h2>
+              <div id="habits-limit-hint" class="text-[10px] font-mono text-slate-500">Лимит базы: 4/4 (PRO — безлимит)</div>
+            </div>
             <div class="flex items-center gap-2">
               <span id="habits-counter" class="text-[11px] font-mono text-cyber-cyan font-bold">0/4</span>
-              <button onclick="App.openHabitModal()" class="px-2.5 py-1 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
+              <button onclick="App.openHabitModal()" class="px-2.5 py-1.5 rounded-lg bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-[10px] font-bold flex items-center gap-1 active:scale-95 transition">
                 <i data-lucide="sparkles" class="w-3 h-3"></i>
                 <span>+ КАТАЛОГ ИДЕЙ</span>
               </button>
@@ -228,12 +246,18 @@
           </div>
         </div>
 
-        <div class="flex gap-2">
-          <input id="new-antihabit-input" type="text" maxlength="36" placeholder="+ Новый таймер отказа (напр. Без энергетиков)..." 
-            class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-crimson font-mono" />
-          <button onclick="App.addAntiHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition">
-            СТАРТ
-          </button>
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-[10px] font-mono uppercase text-slate-400">Добавление таймера отказа</span>
+            <span id="antihabits-limit-hint" class="text-[10px] font-mono text-slate-500">База: до 2 таймеров</span>
+          </div>
+          <div class="flex gap-2">
+            <input id="new-antihabit-input" type="text" maxlength="36" placeholder="+ Новый таймер (напр. Без никотина)..." 
+              class="flex-1 bg-cyber-card border border-cyber-border rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyber-crimson font-mono" />
+            <button onclick="App.addAntiHabit()" class="px-4 py-2.5 rounded-xl bg-cyber-crimson/20 border border-cyber-crimson/50 text-cyber-crimson font-mono text-xs font-bold active:scale-95 transition">
+              СТАРТ
+            </button>
+          </div>
         </div>
 
         <div id="antihabits-list" class="space-y-3"></div>
@@ -292,13 +316,10 @@
         </div>
       </div>
 
-      <!-- VIEW 4: STATS (PHASE 4: 90-DAY HEATMAP, RECORD CARDS & VIRAL STORY GENERATOR) -->
+      <!-- VIEW 4: STATS (90-DAY HEATMAP, RECORD CARDS & VIRAL STORY GENERATOR) -->
       <div id="view-stats" class="hidden space-y-4">
-        
-        <!-- 1. RECORD CARDS (4 METRICS) -->
         <div class="grid grid-cols-2 gap-2.5 font-mono">
-          <!-- Current Streak -->
-          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5">
             <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span>ТЕКУЩИЙ СТРИК</span>
               <i data-lucide="flame" class="w-3.5 h-3.5 text-cyber-crimson"></i>
@@ -307,8 +328,7 @@
             <div class="text-[9px] text-cyber-crimson mt-0.5">Ударный режим</div>
           </div>
 
-          <!-- Best Streak -->
-          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5">
             <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span>ЛУЧШИЙ СТРИК</span>
               <i data-lucide="trophy" class="w-3.5 h-3.5 text-cyber-gold"></i>
@@ -317,8 +337,7 @@
             <div class="text-[9px] text-slate-400 mt-0.5">Абсолютный рекорд</div>
           </div>
 
-          <!-- Discipline Level % -->
-          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5">
             <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span>ДИСЦИПЛИНА</span>
               <i data-lucide="activity" class="w-3.5 h-3.5 text-cyber-emerald"></i>
@@ -327,8 +346,7 @@
             <div id="stat-card-discipline-sub" class="text-[9px] text-slate-400 mt-0.5">Индекс стабильности</div>
           </div>
 
-          <!-- Avatar Stage -->
-          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5">
             <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
               <span>СТАДИЯ АВАТАРА</span>
               <i data-lucide="cpu" class="w-3.5 h-3.5 text-cyber-cyan"></i>
@@ -338,7 +356,6 @@
           </div>
         </div>
 
-        <!-- 2. 90-DAY NEON HEATMAP MATRIX -->
         <div class="bg-cyber-card neon-border-cyan rounded-2xl p-4">
           <div class="flex items-center justify-between mb-3">
             <div>
@@ -351,40 +368,25 @@
             </div>
           </div>
 
-          <!-- 90 Cells Grid (10 columns x 9 rows) -->
-          <div id="heatmap-grid" class="grid grid-cols-10 gap-1.5 my-2">
-            <!-- Populated by JS -->
-          </div>
+          <div id="heatmap-grid" class="grid grid-cols-10 gap-1.5 my-2"></div>
 
-          <!-- Heatmap Legend -->
           <div class="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-2.5 mt-2 border-t border-cyber-border">
-            <span class="flex items-center gap-1">
-              <span class="w-2.5 h-2.5 rounded-sm bg-cyber-cyan shadow-[0_0_6px_#00f0ff] inline-block"></span> Закрыт
-            </span>
-            <span class="flex items-center gap-1">
-              <span class="w-2.5 h-2.5 rounded-sm bg-cyber-gold shadow-[0_0_6px_#fcee0a] inline-block"></span> Рубеж (30/60/90)
-            </span>
-            <span class="flex items-center gap-1">
-              <span class="w-2.5 h-2.5 rounded-sm border border-cyber-crimson bg-cyber-crimson/20 inline-block"></span> Сегодня
-            </span>
-            <span class="flex items-center gap-1">
-              <span class="w-2.5 h-2.5 rounded-sm bg-slate-900 border border-slate-800 inline-block"></span> Впереди
-            </span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-cyber-cyan inline-block"></span> Закрыт</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-cyber-gold inline-block"></span> Рубеж</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm border border-cyber-crimson bg-cyber-crimson/20 inline-block"></span> Сегодня</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm bg-slate-900 border border-slate-800 inline-block"></span> Впереди</span>
           </div>
         </div>
 
-        <!-- 3. VIRAL MARKETING FEATURE: SHARE HERO CARD (STORIES / TIKTOK) -->
         <div class="bg-gradient-to-r from-[#130d24] via-[#0f1322] to-[#0b1b24] neon-border-purple rounded-2xl p-4 space-y-3">
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold font-mono text-[9px] font-bold mb-1">
-                <span>⚡ VIRAL STORY EXPORT // 9:16 HD</span>
-              </div>
-              <h3 class="text-xs font-mono font-black text-white uppercase tracking-wider">КАРТОЧКА ГЕРОЯ ДЛЯ STORIES / TIKTOK</h3>
-              <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                Сгенерируй стильный кибер-постер со своим прокачанным Аватаром, стриком и матрицей 90 дней в 1 клик.
-              </p>
+          <div>
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold font-mono text-[9px] font-bold mb-1">
+              <span>⚡ VIRAL STORY EXPORT // 9:16 HD</span>
             </div>
+            <h3 class="text-xs font-mono font-black text-white uppercase tracking-wider">КАРТОЧКА ГЕРОЯ ДЛЯ STORIES / TIKTOK</h3>
+            <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+              Рендерит твой Аватар со всеми надетыми скинами, крыльями и матрицей 90 дней.
+            </p>
           </div>
 
           <button onclick="App.generateAndPreviewHeroCard()" 
@@ -393,40 +395,119 @@
             <span>ПОДЕЛИТЬСЯ КАРТОЧКОЙ ГЕРОЯ</span>
           </button>
         </div>
-
       </div>
 
-      <!-- VIEW 5: SHOP -->
+      <!-- VIEW 5: SHOP & FREEMIUM MONETIZATION (PHASE 5) -->
       <div id="view-shop" class="hidden space-y-4">
-        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4">
-          <div class="flex items-center justify-between mb-3">
-            <div>
-              <h2 class="text-sm font-mono font-bold text-white uppercase tracking-wider">Арсенал и кастомизация</h2>
-              <p class="text-[11px] text-slate-400">Обменивай монеты дисциплины ⚡ на модули</p>
+        
+        <!-- Top Balance Bar -->
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 flex items-center justify-between">
+          <div>
+            <div class="text-[10px] font-mono uppercase text-slate-400">Черный рынок кибер-имплантов</div>
+            <div class="text-xs font-mono font-bold text-white">ТВОЙ БАЛАНС АКТИВОВ</div>
+          </div>
+          <div class="flex items-center gap-2 font-mono">
+            <div class="flex items-center gap-1 bg-slate-900 border border-cyber-ice/40 px-2.5 py-1 rounded-xl text-xs text-cyber-ice font-bold">
+              <span>❄️</span>
+              <span id="shop-freezes">1</span>
             </div>
-            <div class="flex items-center gap-1 bg-slate-900 border border-cyber-gold/40 px-2.5 py-1 rounded-lg font-mono text-xs text-cyber-gold">
-              <i data-lucide="zap" class="w-3.5 h-3.5 fill-cyber-gold"></i>
+            <div class="flex items-center gap-1 bg-slate-900 border border-cyber-gold/40 px-2.5 py-1 rounded-xl text-xs text-cyber-gold font-bold">
+              <span>⚡</span>
               <span id="shop-coins">0</span>
             </div>
           </div>
+        </div>
 
-          <div class="space-y-2.5">
-            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-mono font-bold text-white">Экстренная калибровка щита</div>
-                <div class="text-[10px] font-mono text-slate-400">Мгновенно чинит трещины после срыва // 30 ⚡</div>
+        <!-- 1. TITAN PRO BANNER (TELEGRAM STARS FLAGSHIP) -->
+        <div id="pro-shop-card" class="relative rounded-2xl bg-gradient-to-br from-[#1f1605] via-[#120d1d] to-[#090d16] neon-border-gold p-4 space-y-3 overflow-hidden">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold text-black font-mono text-[9px] font-black uppercase mb-1">
+                <span>⭐ TELEGRAM STARS EXCLUSIVE</span>
               </div>
-              <button onclick="App.repairShield()" class="px-3 py-1.5 rounded-lg bg-cyber-cyan/20 border border-cyber-cyan/50 text-cyber-cyan font-mono text-xs font-bold active:scale-95">ЧИНИТЬ</button>
-            </div>
-            <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-3 flex items-center justify-between">
-              <div>
-                <div class="text-xs font-mono font-bold text-white">Плазменный контур визора</div>
-                <div class="text-[10px] font-mono text-slate-400">Усиливает свечение Аватара // 100 ⚡</div>
-              </div>
-              <button onclick="App.buyItem(100, 'PlasmaVisor')" class="px-3 py-1.5 rounded-lg bg-cyber-gold/20 border border-cyber-gold/50 text-cyber-gold font-mono text-xs font-bold active:scale-95">КУПИТЬ</button>
+              <h2 class="text-base font-mono font-black text-white uppercase tracking-wide">СТАТУС «ТИТАН PRO»</h2>
+              <p class="text-[11px] text-slate-300 mt-0.5">Полная разблокировка потенциала системы PROJECT 90 навсегда.</p>
             </div>
           </div>
+
+          <ul class="space-y-1.5 text-[11px] font-mono text-slate-200">
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Безлимит на привычки и таймеры отказа (снятие лимита 4/2)</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Эксклюзивные <b>Неоновые Крылья</b> и золотой бейдж <b>[PRO]</b></span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span><b>+2 Крио-заморозки стрика ❄️</b> в подарок сразу</span></li>
+            <li class="flex items-center gap-2"><span class="text-cyber-gold">✦</span> <span>Удвоенный фарм монет за закрытие дня (<b>+60⚡</b> вместо +30⚡)</span></li>
+          </ul>
+
+          <div id="pro-buy-actions" class="pt-1">
+            <button onclick="App.buyWithTelegramStars('titan_pro')" 
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-gold via-amber-400 to-yellow-500 text-black font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-gold/25 flex items-center justify-center gap-1.5 active:scale-98 transition">
+              <span>⭐ АКТИВИРОВАТЬ ТИТАН PRO // 150 STARS</span>
+            </button>
+          </div>
         </div>
+
+        <!-- 2. STREAK FREEZE MODULE (КРИО-ЗАМОРОЗКА СТРИКА) -->
+        <div class="bg-cyber-card border border-cyber-ice/40 rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-cyber-ice/15 border border-cyber-ice/40 flex items-center justify-center text-cyber-ice shrink-0">
+                <i data-lucide="snowflake" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-xs font-mono font-black text-white uppercase">ЗАМОРОЗКА СТРИКА</h3>
+                  <span class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyber-ice/20 text-cyber-ice font-bold">В запасе: <span id="freeze-stock-badge">1</span>/5</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">
+                  Автоматически спасает серию дней и Аватара от отката, если пропустил день.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Free Streak Milestone Progress -->
+          <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-2.5 flex items-center justify-between text-[10px] font-mono">
+            <span class="text-slate-400">🎁 Бесплатная заморозка каждые 7 дней стрика:</span>
+            <span id="freeze-milestone-text" class="text-cyber-ice font-bold">0 / 7 ДН.</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="App.buyStreakFreezeWithCoins()" 
+              class="py-2.5 px-3 rounded-xl bg-cyber-gold/15 border border-cyber-gold/50 text-cyber-gold font-mono font-bold text-[11px] active:scale-95 transition">
+              КУПИТЬ ЗА 150 ⚡
+            </button>
+            <button onclick="App.buyWithTelegramStars('streak_freeze')" 
+              class="py-2.5 px-3 rounded-xl bg-cyber-ice/15 border border-cyber-ice/50 text-cyber-ice font-mono font-bold text-[11px] active:scale-95 transition">
+              КУПИТЬ ЗА 25 ⭐
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. AVATAR COSMETICS (SKINS, AURAS, WINGS, PROGRESS BARS) -->
+        <div>
+          <div class="flex items-center justify-between mb-2.5">
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-4 h-4 text-cyber-cyan"></i>
+              Кастомизация Аватара и Скины
+            </h3>
+            <span class="text-[10px] font-mono text-slate-400">Надевается в 1 клик</span>
+          </div>
+
+          <div id="shop-cosmetics-list" class="space-y-2.5">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- 4. UTILITY: EMERGENCY SHIELD CALIBRATION -->
+        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 flex items-center justify-between">
+          <div>
+            <div class="text-xs font-mono font-bold text-white">Экстренная калибровка щита</div>
+            <div class="text-[10px] font-mono text-slate-400">Мгновенно убирает трещины после срыва // 30 ⚡</div>
+          </div>
+          <button onclick="App.repairShield()" class="px-3.5 py-2 rounded-xl bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan font-mono text-xs font-bold active:scale-95">
+            ЧИНИТЬ (30⚡)
+          </button>
+        </div>
+
       </div>
 
     </main>
@@ -497,7 +578,7 @@
     </div>
   </div>
 
-  <!-- MODAL 2: VIRAL HERO CARD PREVIEW & SHARE/DOWNLOAD -->
+  <!-- MODAL 2: VIRAL HERO CARD PREVIEW -->
   <div id="viral-card-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
     <div class="w-full max-w-sm bg-cyber-card neon-border-cyan rounded-2xl p-4 flex flex-col items-center shadow-2xl max-h-[92vh]">
       <div class="w-full flex items-center justify-between pb-2.5 mb-2 border-b border-cyber-border">
@@ -505,7 +586,6 @@
         <button onclick="App.closeViralModal()" class="text-slate-400 hover:text-white font-mono text-sm px-2">✕</button>
       </div>
 
-      <!-- Generated Image Preview -->
       <div class="w-full flex-1 overflow-hidden flex items-center justify-center my-1">
         <img id="viral-card-preview" alt="PROJECT 90 Hero Card" class="max-h-[60vh] w-auto rounded-xl border border-cyber-border shadow-xl object-contain" />
       </div>
@@ -529,6 +609,31 @@
     </div>
   </div>
 
+  <!-- MODAL 3: TELEGRAM STARS INVOICE SIMULATOR / GATEWAY -->
+  <div id="stars-invoice-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-[#131722] neon-border-gold rounded-2xl p-5 text-center space-y-3 shadow-2xl">
+      <div class="w-12 h-12 rounded-2xl bg-cyber-gold/20 border border-cyber-gold mx-auto flex items-center justify-center text-2xl">
+        ⭐
+      </div>
+      <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-gold">TELEGRAM STARS INVOICE</div>
+      <h3 id="stars-modal-title" class="text-sm font-mono font-black text-white uppercase">ТИТАН PRO</h3>
+      <p id="stars-modal-desc" class="text-xs text-slate-400 leading-relaxed">
+        В продакшене здесь вызывается нативное окно <code class="text-cyber-cyan">Telegram.WebApp.openInvoice()</code>.
+      </p>
+      <div class="py-2 px-3 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-cyber-gold font-bold">
+        К ОПЛАТЕ: <span id="stars-modal-price">150</span> ⭐ STARS
+      </div>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <button onclick="App.closeStarsModal()" class="py-2.5 rounded-xl bg-slate-800 text-slate-300 font-mono text-xs font-bold">
+          ОТМЕНА
+        </button>
+        <button id="stars-confirm-btn" class="py-2.5 rounded-xl bg-cyber-gold text-black font-mono text-xs font-black uppercase active:scale-95 transition">
+          ОПЛАТИТЬ ⭐
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform -translate-y-2">
     <div class="bg-cyber-card neon-border-cyan px-4 py-2 rounded-xl font-mono text-xs text-white flex items-center gap-2 shadow-2xl">
@@ -538,8 +643,49 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'PROJECT_90_PHASE4_STATE';
+    const STORAGE_KEY = 'PROJECT_90_PHASE5_STATE';
     const tg = window.Telegram?.WebApp;
+
+    // Shop Cosmetics Catalog (Coins ⚡, Streak Unlocks 🔥, or Telegram Stars ⭐)
+    const SHOP_COSMETICS = [
+      {
+        id: 'aura_samurai',
+        slot: 'aura',
+        title: 'Красная аура Кибер-Самурая',
+        desc: 'Багровое плазменное кольцо и боевые лезвия вокруг ядра.',
+        type: 'coins',
+        costCoins: 120,
+        badge: '120 ⚡'
+      },
+      {
+        id: 'skin_ghost',
+        slot: 'skin',
+        title: 'Скин Призрака (Ghost Protocol)',
+        desc: 'Фантомный стелс-корпус и неоново-изумрудный визор.',
+        type: 'streak',
+        reqStreak: 5,
+        costCoins: 200,
+        badge: 'СТРИК 5🔥 ИЛИ 200 ⚡'
+      },
+      {
+        id: 'wings_neon',
+        slot: 'wings',
+        title: 'Неоновые крылья Валькирии',
+        desc: 'Энергетические крылья за спиной Аватара (доступно в PRO или за Stars).',
+        type: 'stars',
+        costStars: 75,
+        badge: '75 ⭐ STARS'
+      },
+      {
+        id: 'bar_cyber_gold',
+        slot: 'progressbar',
+        title: 'Кислотно-золотой Прогресс-бар',
+        desc: 'Кастомный неоновый градиент для шкалы дня и фазы эволюции.',
+        type: 'coins',
+        costCoins: 90,
+        badge: '90 ⚡'
+      }
+    ];
 
     const HABIT_CATALOG = {
       str: [
@@ -597,14 +743,14 @@
             gain.gain.linearRampToValueAtTime(0.01, now + 0.35);
             osc.start(now);
             osc.stop(now + 0.35);
-          } else if (type === 'nudge') {
-            osc.type = 'square';
+          } else if (type === 'powerup') {
+            osc.type = 'sine';
             osc.frequency.setValueAtTime(440, now);
-            osc.frequency.setValueAtTime(680, now + 0.05);
-            gain.gain.setValueAtTime(0.09, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.14);
+            osc.frequency.exponentialRampToValueAtTime(987.77, now + 0.28);
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
             osc.start(now);
-            osc.stop(now + 0.14);
+            osc.stop(now + 0.3);
           }
         } catch (e) {}
       }
@@ -622,17 +768,27 @@
     const nowMs = Date.now();
     const DEFAULT_STATE = {
       callsign: 'OPERATOR_01',
+      isPro: false,
       day: 1,
       streak: 0,
       bestStreak: 0,
+      streakFreezes: 1,
+      lastFreezeRewardStreak: 0,
       completedDays: [],
-      coins: 20,
-      totalCoinsEarned: 20,
+      coins: 130,
+      totalCoinsEarned: 130,
       totalSlips: 0,
       shieldCracked: false,
       lastSlipTime: null,
       lastCompletedDate: null,
       lastResetDate: null,
+      ownedItems: [],
+      equipped: {
+        aura: null,
+        wings: null,
+        skin: null,
+        progressbar: null
+      },
       habits: [
         { id: 'h1', title: 'Силовая тренировка / Зарядка', done: false, category: 'СИЛА' },
         { id: 'h2', title: 'Фокус без телефона (90 минут)', done: false, category: 'РАЗУМ' },
@@ -641,15 +797,13 @@
       ],
       antihabits: [
         { id: 'ah_smoke', title: 'Без курения и никотина', startTime: nowMs - 3 * 86400000 - 14400000, bestSeconds: 3 * 86400 + 14400, slips: 0 },
-        { id: 'ah_junk', title: 'Без фастфуда и мусорной еды', startTime: nowMs - 1 * 86400000 - 7200000, bestSeconds: 4 * 86400, slips: 1 },
         { id: 'ah_sugar', title: 'Без рафинированного сахара', startTime: nowMs - 5 * 86400000 - 3600000, bestSeconds: 5 * 86400 + 3600, slips: 0 }
       ],
       clanMembers: [
         { id: 'peer_vanguard', name: 'KIRA_NEXUS', day: 34, streak: 19, doneToday: true },
         { id: 'peer_monk', name: 'GHOST_77', day: 64, streak: 42, doneToday: true },
         { id: 'peer_sleeper', name: 'DEN_ZERO', day: 9, streak: 2, doneToday: false }
-      ],
-      inventory: []
+      ]
     };
 
     const App = {
@@ -673,13 +827,9 @@
         }
         document.getElementById('user-callsign').textContent = this.state.callsign;
 
-        // Ensure bestStreak is never lower than current streak
-        if ((this.state.streak || 0) > (this.state.bestStreak || 0)) {
-          this.state.bestStreak = this.state.streak;
-        }
-        if (!Array.isArray(this.state.completedDays)) {
-          this.state.completedDays = [];
-        }
+        if (!Array.isArray(this.state.ownedItems)) this.state.ownedItems = [];
+        if (!this.state.equipped) this.state.equipped = { aura: null, wings: null, skin: null, progressbar: null };
+        if (typeof this.state.streakFreezes !== 'number') this.state.streakFreezes = 1;
 
         this.checkRollover();
         this.checkIncomingReferral();
@@ -693,6 +843,12 @@
         return new Date().toISOString().slice(0, 10);
       },
 
+      getYesterdayISO() {
+        const d = new Date();
+        d.setDate(d.getDate() - 1);
+        return d.toISOString().slice(0, 10);
+      },
+
       getStageInfo(day) {
         if (day >= 90) return { stage: 5, title: 'ТИТАН', primary: '#fcee0a', secondary: '#ff003c' };
         if (day >= 61) return { stage: 4, title: 'МОНАХ', primary: '#ff003c', secondary: '#00f0ff' };
@@ -701,16 +857,251 @@
         return { stage: 1, title: 'СПЯЩИЙ', primary: '#64748b', secondary: '#1e293b' };
       },
 
-      // Calculate overall Discipline Rating (0..100%)
       getDisciplineScore() {
         const totalHabits = this.state.habits.length || 1;
         const doneHabits = this.state.habits.filter(h => h.done).length;
         const todayRatio = doneHabits / totalHabits;
         const shieldBonus = this.state.shieldCracked ? 0 : 25;
         const streakBonus = Math.min(25, (this.state.streak || 0) * 3);
-        const raw = Math.round((todayRatio * 50) + shieldBonus + streakBonus);
-        return Math.max(10, Math.min(100, raw));
+        return Math.max(10, Math.min(100, Math.round((todayRatio * 50) + shieldBonus + streakBonus)));
       },
+
+      // Check daily rollover + Duolingo-style Streak Freeze Protection
+      checkRollover() {
+        const today = this.getTodayISO();
+        const yesterday = this.getYesterdayISO();
+
+        if (this.state.lastResetDate && this.state.lastResetDate !== today) {
+          // Check if user missed yesterday
+          if (this.state.lastCompletedDate && this.state.lastCompletedDate < yesterday && this.state.streak > 0) {
+            if (this.state.streakFreezes > 0) {
+              this.state.streakFreezes -= 1;
+              this.state.lastCompletedDate = yesterday;
+              setTimeout(() => {
+                this.showToast('❄️ КРИО-ЗАМОРОЗКА СПАСЛА ТВОЙ СТРИК И АВАТАРА!');
+              }, 600);
+            } else {
+              this.state.streak = 0;
+              this.state.day = Math.max(1, this.state.day - 1);
+              setTimeout(() => {
+                this.showToast('⚠️ ПРОПУСК ДНЯ БЕЗ ЗАМОРОЗКИ! СТРИК ОБНУЛЕН');
+              }, 600);
+            }
+          }
+          this.state.habits.forEach(h => h.done = false);
+          this.state.lastResetDate = today;
+          this.saveState();
+        } else if (!this.state.lastResetDate) {
+          this.state.lastResetDate = today;
+          this.saveState();
+        }
+      },
+
+      // =====================================================
+      // PHASE 5: MONETIZATION, TELEGRAM STARS & COSMETICS SHOP
+      // =====================================================
+
+      /**
+       * Production-ready stub for Telegram Stars payments.
+       * When backend bot is connected, pass a real invoice slug/URL to tg.openInvoice(url, cb).
+       */
+      buyWithTelegramStars(itemId) {
+        Haptics.impact('medium');
+
+        const catalogItem = SHOP_COSMETICS.find(i => i.id === itemId);
+        let title = 'МОДУЛЬ PROJECT 90';
+        let priceStars = 50;
+
+        if (itemId === 'titan_pro') {
+          if (this.state.isPro) {
+            this.showToast('СТАТУС «ТИТАН PRO» УЖЕ АКТИВЕН!');
+            return;
+          }
+          title = 'СТАТУС «ТИТАН PRO» (НАВСЕГДА)';
+          priceStars = 150;
+        } else if (itemId === 'streak_freeze') {
+          if (this.state.streakFreezes >= 5) {
+            this.showToast('МАКСИМУМ 5 КРИО-ЗАМОРОЗОК В ЗАПАСЕ');
+            return;
+          }
+          title = '+1 КРИО-ЗАМОРОЗКА СТРИКА ❄️';
+          priceStars = 25;
+        } else if (catalogItem) {
+          title = catalogItem.title;
+          priceStars = catalogItem.costStars || 75;
+        }
+
+        // Real Telegram WebApp Invoice Hook (if invoiceUrl is provided by backend)
+        // Example: tg.openInvoice('https://t.me/$invoiceSlug', (status) => { if (status === 'paid') ... })
+        document.getElementById('stars-modal-title').textContent = title;
+        document.getElementById('stars-modal-price').textContent = priceStars;
+        const modal = document.getElementById('stars-invoice-modal');
+        modal.classList.remove('hidden');
+
+        const confirmBtn = document.getElementById('stars-confirm-btn');
+        confirmBtn.onclick = () => {
+          modal.classList.add('hidden');
+          this.onTelegramStarsSuccess(itemId);
+        };
+      },
+
+      closeStarsModal() {
+        Haptics.impact('light');
+        document.getElementById('stars-invoice-modal').classList.add('hidden');
+      },
+
+      onTelegramStarsSuccess(itemId) {
+        SoundFX.play('powerup');
+        Haptics.notify('success');
+
+        if (itemId === 'titan_pro') {
+          this.state.isPro = true;
+          this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 2);
+          if (!this.state.ownedItems.includes('wings_neon')) {
+            this.state.ownedItems.push('wings_neon');
+          }
+          this.state.equipped.wings = 'wings_neon';
+          this.showToast('⭐ ТИТАН PRO АКТИВИРОВАН! ЛИМИТЫ СНЯТЫ + КРЫЛЬЯ');
+        } else if (itemId === 'streak_freeze') {
+          this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
+          this.showToast('❄️ +1 КРИО-ЗАМОРОЗКА ДОБАВЛЕНА В АРСЕНАЛ!');
+        } else {
+          const item = SHOP_COSMETICS.find(i => i.id === itemId);
+          if (item) {
+            if (!this.state.ownedItems.includes(item.id)) {
+              this.state.ownedItems.push(item.id);
+            }
+            this.state.equipped[item.slot] = item.id;
+            this.showToast(`⭐ РАЗБЛОКИРОВАНО И НАДЕТО: ${item.title}`);
+          }
+        }
+
+        this.saveState();
+        this.renderAll();
+      },
+
+      buyStreakFreezeWithCoins() {
+        if (this.state.streakFreezes >= 5) {
+          this.showToast('МАКСИМУМ 5 ЗАМОРОЗОК В ИНВЕНТАРЕ');
+          return;
+        }
+        if (this.state.coins < 150) {
+          Haptics.notify('error');
+          this.showToast('НУЖНО 150 ⚡ МОНЕТ ДИСЦИПЛИНЫ');
+          return;
+        }
+        this.state.coins -= 150;
+        this.state.streakFreezes += 1;
+        SoundFX.play('powerup');
+        Haptics.notify('success');
+        this.saveState();
+        this.renderAll();
+        this.showToast('❄️ КРИО-ЗАМОРОЗКА КУПЛЕНА ЗА 150⚡!');
+      },
+
+      unlockOrEquipCosmetic(itemId) {
+        const item = SHOP_COSMETICS.find(i => i.id === itemId);
+        if (!item) return;
+
+        const isUnlockedByStreak = item.type === 'streak' && (this.state.bestStreak >= item.reqStreak || this.state.streak >= item.reqStreak);
+        const isOwned = this.state.ownedItems.includes(item.id) || isUnlockedByStreak || (item.id === 'wings_neon' && this.state.isPro);
+
+        if (isOwned) {
+          // Toggle equip / unequip
+          if (this.state.equipped[item.slot] === item.id) {
+            this.state.equipped[item.slot] = null;
+            this.showToast(`СНЯТО: ${item.title}`);
+          } else {
+            this.state.equipped[item.slot] = item.id;
+            SoundFX.play('powerup');
+            this.showToast(`ЭКИПИРОВАНО: ${item.title}`);
+          }
+          Haptics.impact('medium');
+          this.saveState();
+          this.renderAll();
+          return;
+        }
+
+        // Purchase logic if not owned yet
+        if (item.type === 'stars') {
+          this.buyWithTelegramStars(item.id);
+          return;
+        }
+
+        if (this.state.coins < item.costCoins) {
+          Haptics.notify('error');
+          this.showToast(`НЕХВАТКА МОНЕТ: НУЖНО ${item.costCoins} ⚡`);
+          return;
+        }
+
+        this.state.coins -= item.costCoins;
+        this.state.ownedItems.push(item.id);
+        this.state.equipped[item.slot] = item.id;
+        SoundFX.play('powerup');
+        Haptics.notify('success');
+        this.saveState();
+        this.renderAll();
+        this.showToast(`КУПЛЕНО И НАДЕТО: ${item.title}!`);
+      },
+
+      renderShop() {
+        document.getElementById('shop-coins').textContent = this.state.coins;
+        document.getElementById('shop-freezes').textContent = this.state.streakFreezes;
+        document.getElementById('freeze-stock-badge').textContent = this.state.streakFreezes;
+
+        const mod7 = (this.state.streak || 0) % 7;
+        document.getElementById('freeze-milestone-text').textContent = `${mod7} / 7 ДН.`;
+
+        // PRO Banner status
+        const proActions = document.getElementById('pro-buy-actions');
+        if (this.state.isPro) {
+          proActions.innerHTML = `
+            <div class="w-full py-2.5 rounded-xl bg-cyber-emerald/20 border border-cyber-emerald text-cyber-emerald font-mono font-black text-xs text-center uppercase">
+              ✓ СТАТУС «ТИТАН PRO» АКТИВЕН НАВСЕГДА
+            </div>
+          `;
+        }
+
+        // Cosmetics List
+        const list = document.getElementById('shop-cosmetics-list');
+        list.innerHTML = SHOP_COSMETICS.map(item => {
+          const isUnlockedByStreak = item.type === 'streak' && (this.state.bestStreak >= item.reqStreak || this.state.streak >= item.reqStreak);
+          const isOwned = this.state.ownedItems.includes(item.id) || isUnlockedByStreak || (item.id === 'wings_neon' && this.state.isPro);
+          const isEquipped = this.state.equipped?.[item.slot] === item.id;
+
+          let btnText = item.badge;
+          let btnClass = 'bg-cyber-cyan/15 border border-cyber-cyan/50 text-cyber-cyan';
+
+          if (isEquipped) {
+            btnText = '✓ НАДЕТО (СНЯТЬ)';
+            btnClass = 'bg-cyber-emerald text-black font-black border border-cyber-emerald';
+          } else if (isOwned) {
+            btnText = 'НАДЕТЬ';
+            btnClass = 'bg-slate-800 border border-cyber-cyan text-cyber-cyan';
+          } else if (item.type === 'stars') {
+            btnClass = 'bg-cyber-gold/20 border border-cyber-gold text-cyber-gold';
+          }
+
+          return `
+            <div class="bg-cyber-card border ${isEquipped ? 'border-cyber-emerald/60' : 'border-cyber-border'} rounded-2xl p-3.5 flex items-center justify-between gap-3">
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-xs font-mono font-bold text-white truncate">${item.title}</span>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-0.5 leading-snug">${item.desc}</p>
+              </div>
+              <button onclick="App.unlockOrEquipCosmetic('${item.id}')" 
+                class="shrink-0 px-3 py-2 rounded-xl font-mono text-[10px] font-bold uppercase active:scale-95 transition ${btnClass}">
+                ${btnText}
+              </button>
+            </div>
+          `;
+        }).join('');
+      },
+
+      // =====================================================
+      // CORE HABITS, ANTI-HABITS & CLAN ENGINE
+      // =====================================================
 
       getMiniAvatarSVG(day) {
         const info = this.getStageInfo(day);
@@ -801,11 +1192,8 @@
         const myInfo = this.getStageInfo(this.state.day);
         const appLink = `https://t.me/share/url?url=${encodeURIComponent(`https://t.me/Project90WinterArcBot?startapp=${refToken}`)}&text=${encodeURIComponent(`⚡ Залетай в мой Клан PROJECT 90! Мой Аватар на стадии «${myInfo.title}» (Ур. ${myInfo.stage}, Стрик: ${this.state.streak}🔥). Переходи по ссылке — добавишься в мой лидерборд:`)}`;
 
-        if (tg?.openTelegramLink) {
-          tg.openTelegramLink(appLink);
-        } else {
-          window.open(appLink, '_blank');
-        }
+        if (tg?.openTelegramLink) tg.openTelegramLink(appLink);
+        else window.open(appLink, '_blank');
       },
 
       copyMyRefCode() {
@@ -832,7 +1220,6 @@
       },
 
       nudgeFriend(friendName) {
-        SoundFX.play('nudge');
         Haptics.impact('heavy');
         const myInfo = this.getStageInfo(this.state.day);
         const refToken = this.generateMyRefToken();
@@ -840,11 +1227,8 @@
         const text = `⚡ Йо, ${friendName}! Мой аватар уже на ${myInfo.stage} уровне («${myInfo.title}», стрик ${this.state.streak}🔥), а ты еще не закрыл задачи за сегодня! Не сливай стрик!`;
         const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent(text)}`;
 
-        if (tg?.openTelegramLink) {
-          tg.openTelegramLink(shareUrl);
-        } else {
-          window.open(shareUrl, '_blank');
-        }
+        if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
+        else window.open(shareUrl, '_blank');
       },
 
       async loadState() {
@@ -875,21 +1259,6 @@
         localStorage.setItem(STORAGE_KEY, str);
         if (tg?.CloudStorage) {
           tg.CloudStorage.setItem(STORAGE_KEY, str);
-        }
-      },
-
-      checkRollover() {
-        const today = this.getTodayISO();
-        if (this.state.lastResetDate !== today) {
-          this.state.habits.forEach(h => h.done = false);
-          this.state.lastResetDate = today;
-          this.saveState();
-        }
-        if (this.state.shieldCracked && this.state.lastSlipTime) {
-          if (Date.now() - this.state.lastSlipTime > 12 * 3600 * 1000) {
-            this.state.shieldCracked = false;
-            this.saveState();
-          }
         }
       },
 
@@ -971,13 +1340,22 @@
         }
         this.state.coins -= 30;
         this.state.shieldCracked = false;
+        SoundFX.play('powerup');
         Haptics.notify('success');
         this.saveState();
         this.renderAll();
         this.showToast('🛡 ЭНЕРГЕТИЧЕСКИЙ ЩИТ ВОССТАНОВЛЕН!');
       },
 
+      // Freemium Check on Adding Anti-Habits (Max 2 in Free, Unlimited in PRO)
       addAntiHabit() {
+        if (!this.state.isPro && this.state.antihabits.length >= 2) {
+          Haptics.notify('warning');
+          this.showToast('🔒 В БАЗОВОЙ ВЕРСИИ ДО 2 ТАЙМЕРОВ. ОТКРОЙ ТИТАН PRO!');
+          this.switchTab('shop');
+          return;
+        }
+
         const input = document.getElementById('new-antihabit-input');
         const title = input.value.trim();
         if (!title) return;
@@ -992,7 +1370,7 @@
         input.value = '';
         Haptics.impact('medium');
         this.saveState();
-        this.renderAntiHabits();
+        this.renderAll();
         this.showToast('ТАЙМЕР ОТКАЗА ЗАПУЩЕН');
       },
 
@@ -1070,7 +1448,20 @@
         }).join('');
       },
 
+      // Freemium Check on Adding Habits (Max 4 in Free, Unlimited in PRO)
+      canAddMoreHabits() {
+        if (!this.state.isPro && this.state.habits.length >= 4) {
+          Haptics.notify('warning');
+          this.closeHabitModal();
+          this.switchTab('shop');
+          this.showToast('🔒 ЛИМИТ 4 ПРИВЫЧКИ В БАЗЕ. АКТИВИРУЙ ТИТАН PRO!');
+          return false;
+        }
+        return true;
+      },
+
       addPresetHabit(cat, idx) {
+        if (!this.canAddMoreHabits()) return;
         const item = HABIT_CATALOG[cat]?.[idx];
         if (!item) return;
 
@@ -1090,6 +1481,7 @@
       },
 
       addCustomHabit() {
+        if (!this.canAddMoreHabits()) return;
         const input = document.getElementById('custom-habit-input');
         const title = input.value.trim();
         if (!title) return;
@@ -1116,20 +1508,6 @@
         this.renderAll();
       },
 
-      buyItem(cost, name) {
-        if (this.state.coins < cost) {
-          Haptics.notify('error');
-          this.showToast('НЕХВАТКА МОНЕТ ДИСЦИПЛИНЫ ⚡');
-          return;
-        }
-        this.state.coins -= cost;
-        this.state.inventory.push(name);
-        Haptics.notify('success');
-        this.saveState();
-        this.renderAll();
-        this.showToast(`МОДУЛЬ АКТИВИРОВАН: ${name}!`);
-      },
-
       lockInDay() {
         const today = this.getTodayISO();
         if (this.state.lastCompletedDate === today) {
@@ -1152,39 +1530,64 @@
         if (this.state.streak > (this.state.bestStreak || 0)) {
           this.state.bestStreak = this.state.streak;
         }
+
+        // Free Streak Freeze every 7 streak days!
+        if (this.state.streak % 7 === 0 && this.state.lastFreezeRewardStreak !== this.state.streak) {
+          this.state.streakFreezes = Math.min(5, (this.state.streakFreezes || 0) + 1);
+          this.state.lastFreezeRewardStreak = this.state.streak;
+          setTimeout(() => {
+            this.showToast('🎁 БОНУС ЗА 7 ДНЕЙ СТРИКА: +1 КРИО-ЗАМОРОЗКА ❄️!');
+          }, 1200);
+        }
+
         if (this.state.day < 90) this.state.day += 1;
         this.state.lastCompletedDate = today;
-        this.state.coins += 30;
-        this.state.totalCoinsEarned += 30;
+
+        const rewardCoins = this.state.isPro ? 60 : 30;
+        this.state.coins += rewardCoins;
+        this.state.totalCoinsEarned += rewardCoins;
         this.state.shieldCracked = false;
 
-        SoundFX.play('coin');
+        SoundFX.play('powerup');
         Haptics.notify('success');
         this.saveState();
         this.renderAll();
-        this.showToast(`ДЕНЬ ЗАКРЫТ (+30⚡)! СЕРИЯ: ${this.state.streak} ДН.`);
+        this.showToast(`ДЕНЬ ЗАКРЫТ (+${rewardCoins}⚡)! СЕРИЯ: ${this.state.streak} ДН.`);
       },
 
+      // Render Dynamic SVG Avatar + Equipped Cosmetics (Aura, Wings, Ghost Skin)
       renderAvatar() {
         const day = this.state.day;
         const cracked = this.state.shieldCracked;
         const info = this.getStageInfo(day);
+        const eq = this.state.equipped || {};
 
         document.getElementById('avatar-stage-title').textContent = `${info.title} (УР. ${info.stage})`;
         document.getElementById('current-day-label').textContent = day;
         document.getElementById('avatar-level').textContent = info.stage;
+
+        // Custom Progress Bar Skin Check
+        const phaseBar = document.getElementById('phase-bar');
+        const dayBar = document.getElementById('day-bar');
+        if (eq.progressbar === 'bar_cyber_gold') {
+          phaseBar.className = 'h-full bg-gradient-to-r from-cyber-gold via-amber-400 to-cyber-emerald rounded-full transition-all duration-500 shadow-[0_0_10px_#fcee0a]';
+          dayBar.className = 'h-full bg-gradient-to-r from-cyber-gold to-amber-500 rounded-full transition-all duration-500';
+        } else {
+          phaseBar.className = 'h-full bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-gold rounded-full transition-all duration-500';
+          dayBar.className = 'h-full bg-gradient-to-r from-emerald-500 to-cyber-emerald rounded-full transition-all duration-500';
+        }
 
         const cardBox = document.getElementById('avatar-card-box');
         const shieldBadge = document.getElementById('shield-badge');
         const repairBtn = document.getElementById('btn-repair-shield');
 
         if (cracked) {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-[#1a0b12] to-[#080a10] neon-border-crimson p-4 flex flex-col items-center justify-center overflow-hidden min-h-[275px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-[#1a0b12] to-[#080a10] neon-border-crimson p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-crimson/20 text-cyber-crimson border border-cyber-crimson text-[9px] font-bold mt-0.5 animate-pulse';
           shieldBadge.innerHTML = '<span>⚠️ ЩИТ ПРОБИТ</span>';
           repairBtn.classList.remove('hidden');
         } else {
-          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[275px] transition-all duration-300';
+          cardBox.className = 'relative rounded-2xl bg-gradient-to-b from-cyber-card to-[#080a10] neon-border-cyan p-4 flex flex-col items-center justify-center overflow-hidden min-h-[280px] transition-all duration-300';
           shieldBadge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40 text-[9px] font-bold mt-0.5';
           shieldBadge.innerHTML = '<span>🛡 ЩИТ АКТИВЕН</span>';
           repairBtn.classList.add('hidden');
@@ -1203,36 +1606,60 @@
           phaseText = `ФАЗА 3 // ${day} / 90 ДН.`;
         }
         document.getElementById('phase-xp-text').textContent = phaseText;
-        document.getElementById('phase-bar').style.width = `${phasePercent}%`;
+        phaseBar.style.width = `${phasePercent}%`;
+
+        // Equipped Cosmetics SVG Layers
+        const hasSamuraiAura = eq.aura === 'aura_samurai';
+        const hasNeonWings = eq.wings === 'wings_neon';
+        const hasGhostSkin = eq.skin === 'skin_ghost';
+
+        const primaryColor = cracked ? '#ff003c' : hasSamuraiAura ? '#ff003c' : hasGhostSkin ? '#00ff66' : info.primary;
+        const bodyFill = hasGhostSkin ? 'rgba(15, 23, 42, 0.45)' : '#0b0f19';
+
+        const wingsSVG = hasNeonWings ? `
+          <!-- EQUIPPED NEON VALKYRIE WINGS -->
+          <g opacity="0.92">
+            <polygon points="62,82 12,42 24,86 14,116 58,112" fill="rgba(252,238,10,0.18)" stroke="#fcee0a" stroke-width="2" />
+            <polygon points="138,82 188,42 176,86 186,116 142,112" fill="rgba(252,238,10,0.18)" stroke="#fcee0a" stroke-width="2" />
+          </g>
+        ` : '';
+
+        const samuraiAuraSVG = hasSamuraiAura ? `
+          <!-- EQUIPPED CYBER-SAMURAI RED AURA -->
+          <g class="animate-spin-reverse">
+            <circle cx="100" cy="100" r="82" fill="none" stroke="#ff003c" stroke-width="2.2" stroke-dasharray="22 8 4 8" />
+            <polygon points="100,10 106,24 94,24" fill="#ff003c" />
+            <polygon points="100,190 106,176 94,176" fill="#ff003c" />
+          </g>
+        ` : '';
 
         const shieldLayerSVG = cracked ? `
           <g opacity="0.9">
             <polygon points="100,10 176,52 176,148 100,190 24,148 24,52" fill="rgba(255,0,60,0.08)" stroke="#ff003c" stroke-width="2" stroke-dasharray="18 8 4 8" />
             <polyline points="100,10 92,48 114,72 86,105 110,145 100,190" fill="none" stroke="#ff003c" stroke-width="2.5" />
-            <polyline points="24,52 68,78 92,48" fill="none" stroke="#ff003c" stroke-width="1.8" />
-            <polyline points="176,148 134,118 86,105" fill="none" stroke="#ff003c" stroke-width="1.8" />
           </g>
         ` : `
           <g class="animate-shield">
-            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.06)" stroke="#00f0ff" stroke-width="1.8" opacity="0.85" />
-            <circle cx="100" cy="100" r="88" fill="none" stroke="#00f0ff" stroke-width="1" stroke-dasharray="6 10" opacity="0.45" class="animate-spin-slow" />
+            <polygon points="100,12 174,54 174,146 100,188 26,146 26,54" fill="rgba(0,240,255,0.05)" stroke="#00f0ff" stroke-width="1.6" opacity="0.8" />
           </g>
         `;
 
         const svg = `
-          <svg viewBox="0 0 200 200" class="w-48 h-48 transition-transform duration-200 drop-shadow-[0_0_16px_${cracked ? '#ff003c' : info.primary}]">
+          <svg viewBox="0 0 200 200" class="w-48 h-48 transition-transform duration-200 drop-shadow-[0_0_16px_${primaryColor}]">
             <defs>
               <radialGradient id="avatarGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="${cracked ? '#ff003c' : info.primary}" stop-opacity="${info.stage === 1 ? 0.35 : 0.85}"/>
+                <stop offset="0%" stop-color="${primaryColor}" stop-opacity="${info.stage === 1 ? 0.4 : 0.85}"/>
                 <stop offset="70%" stop-color="${info.secondary}" stop-opacity="0.3"/>
                 <stop offset="100%" stop-color="#07080c" stop-opacity="0"/>
               </radialGradient>
             </defs>
             <circle cx="100" cy="100" r="76" fill="url(#avatarGrad)" />
-            ${info.stage >= 3 ? `<g class="animate-spin-slow"><circle cx="100" cy="100" r="68" fill="none" stroke="${info.primary}" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.8" /></g>` : ''}
-            ${info.stage === 5 ? `<ellipse cx="100" cy="36" rx="28" ry="8" fill="none" stroke="#fcee0a" stroke-width="2.5" class="animate-pulse" /><polygon points="100,20 106,30 94,30" fill="#fcee0a" />` : ''}
-            <polygon points="100,48 134,74 126,126 100,148 74,126 66,74" fill="#0b0f19" stroke="${cracked ? '#ff003c' : info.primary}" stroke-width="2.2" />
-            <polygon points="78,90 100,97 122,90 116,101 100,105 84,101" fill="${cracked ? '#ff003c' : info.primary}" />
+            ${samuraiAuraSVG}
+            ${wingsSVG}
+            ${info.stage >= 3 ? `<g class="animate-spin-slow"><circle cx="100" cy="100" r="68" fill="none" stroke="${primaryColor}" stroke-width="1.5" stroke-dasharray="14 10" opacity="0.8" /></g>` : ''}
+            ${info.stage === 5 || this.state.isPro ? `<ellipse cx="100" cy="36" rx="28" ry="8" fill="none" stroke="#fcee0a" stroke-width="2.5" class="animate-pulse" />` : ''}
+            <polygon points="100,48 134,74 126,126 100,148 74,126 66,74" fill="${bodyFill}" stroke="${primaryColor}" stroke-width="2.2" />
+            <polygon points="78,90 100,97 122,90 116,101 100,105 84,101" fill="${primaryColor}" />
             <polygon points="100,118 106,126 100,134 94,126" fill="${info.secondary}" />
             ${shieldLayerSVG}
           </svg>
@@ -1250,6 +1677,9 @@
         document.getElementById('habits-counter').textContent = `${doneCount}/${total}`;
         document.getElementById('day-progress-text').textContent = `${pct}%`;
         document.getElementById('day-bar').style.width = `${pct}%`;
+        document.getElementById('habits-limit-hint').textContent = this.state.isPro
+          ? 'СТАТУС ТИТАН PRO: БЕЗЛИМИТ ПРИВЫЧЕК'
+          : `Лимит базы: ${total}/4 привычек (PRO — безлимит)`;
 
         list.innerHTML = this.state.habits.map(h => `
           <div onclick="App.toggleHabit('${h.id}')" 
@@ -1284,6 +1714,10 @@
       },
 
       renderAntiHabits() {
+        document.getElementById('antihabits-limit-hint').textContent = this.state.isPro
+          ? 'PRO: БЕЗЛИМИТ ТАЙМЕРОВ'
+          : `База: ${this.state.antihabits.length}/2 таймеров`;
+
         const list = document.getElementById('antihabits-list');
         const now = Date.now();
 
@@ -1393,7 +1827,6 @@
         }).join('');
       },
 
-      // PHASE 4: Render Stats Tab (4 Record Cards + 90-Day Neon Heatmap)
       renderStats() {
         const day = this.state.day;
         const streak = this.state.streak || 0;
@@ -1408,7 +1841,6 @@
         document.getElementById('stat-card-stage').textContent = info.title;
         document.getElementById('stat-card-stage-sub').textContent = `Уровень ${info.stage} // День ${day}/90`;
 
-        // Render 90-Day Heatmap Grid
         const grid = document.getElementById('heatmap-grid');
         let html = '';
         let closedCount = 0;
@@ -1417,7 +1849,6 @@
           const isCompleted = this.state.completedDays.includes(i) || i < day;
           const isCurrent = i === day;
           const isMilestone = i === 30 || i === 60 || i === 90;
-
           if (isCompleted) closedCount++;
 
           let cellStyle = 'bg-slate-900/90 border border-slate-800 text-slate-500';
@@ -1427,8 +1858,6 @@
             cellStyle = 'bg-cyber-cyan text-black font-black shadow-[0_0_8px_rgba(0,240,255,0.55)] border border-cyber-cyan';
           } else if (isCurrent) {
             cellStyle = 'bg-cyber-crimson/25 border border-cyber-crimson text-white font-bold animate-pulse';
-          } else if (isMilestone) {
-            cellStyle = 'bg-slate-900 border border-cyber-gold/40 text-cyber-gold/70';
           }
 
           html += `
@@ -1447,16 +1876,11 @@
       inspectHeatmapDay(dayNum) {
         Haptics.impact('light');
         const isDone = this.state.completedDays.includes(dayNum) || dayNum < this.state.day;
-        if (isDone) {
-          this.showToast(`ДЕНЬ ${dayNum}/90 // ПРОТОКОЛ ВЫПОЛНЕН ✓`);
-        } else if (dayNum === this.state.day) {
-          this.showToast(`ДЕНЬ ${dayNum}/90 // ТЕКУЩИЙ БОЕВОЙ ДЕНЬ`);
-        } else {
-          this.showToast(`ДЕНЬ ${dayNum}/90 // ОЖИДАЕТ ТРАНСФОРМАЦИИ`);
-        }
+        if (isDone) this.showToast(`ДЕНЬ ${dayNum}/90 // ВЫПОЛНЕН ✓`);
+        else if (dayNum === this.state.day) this.showToast(`ДЕНЬ ${dayNum}/90 // ТЕКУЩИЙ ДЕНЬ`);
+        else this.showToast(`ДЕНЬ ${dayNum}/90 // ВПЕРЕДИ`);
       },
 
-      // PHASE 4 VIRAL FEATURE: High-Res 1080x1920 Stories Poster Generator on Hidden Canvas
       generateAndPreviewHeroCard() {
         Haptics.impact('heavy');
         SoundFX.play('coin');
@@ -1470,10 +1894,10 @@
         const streak = this.state.streak || 0;
         const discipline = this.getDisciplineScore();
         const info = this.getStageInfo(day);
+        const eq = this.state.equipped || {};
         const cracked = this.state.shieldCracked;
-        const accent = cracked ? '#ff003c' : info.primary;
+        const accent = cracked ? '#ff003c' : eq.aura === 'aura_samurai' ? '#ff003c' : eq.skin === 'skin_ghost' ? '#00ff66' : info.primary;
 
-        // 1. Deep Cyberpunk Background Gradient
         const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
         bgGrad.addColorStop(0, '#05060a');
         bgGrad.addColorStop(0.5, '#0c101d');
@@ -1481,22 +1905,15 @@
         ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, W, H);
 
-        // 2. Subtle Perspective Cyber Grid
         ctx.strokeStyle = 'rgba(0, 240, 255, 0.06)';
         ctx.lineWidth = 2;
-        for (let x = 0; x <= W; x += 90) {
-          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-        }
-        for (let y = 0; y <= H; y += 90) {
-          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-        }
+        for (let x = 0; x <= W; x += 90) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+        for (let y = 0; y <= H; y += 90) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
 
-        // 3. Outer Neon Frame
         ctx.strokeStyle = accent;
         ctx.lineWidth = 5;
         ctx.strokeRect(48, 48, W - 96, H - 96);
 
-        // Top System Header
         ctx.fillStyle = '#00f0ff';
         ctx.font = 'bold 34px monospace';
         ctx.textAlign = 'left';
@@ -1504,14 +1921,13 @@
 
         ctx.fillStyle = '#94a3b8';
         ctx.font = '26px monospace';
-        ctx.fillText(`OPERATOR: ${this.state.callsign}`, 96, 175);
+        ctx.fillText(`OPERATOR: ${this.state.callsign} ${this.state.isPro ? '[PRO]' : ''}`, 96, 175);
 
         ctx.textAlign = 'right';
         ctx.fillStyle = '#fcee0a';
         ctx.font = 'bold 34px monospace';
         ctx.fillText(`LVL ${info.stage} // ${info.title}`, W - 96, 130);
 
-        // 4. Central Glowing Avatar & Aura (Center X: 540, Y: 620)
         const cx = 540;
         const cy = 620;
 
@@ -1524,32 +1940,31 @@
         ctx.arc(cx, cy, 330, 0, Math.PI * 2);
         ctx.fill();
 
-        // Outer Hex Shield on Canvas
-        ctx.save();
-        ctx.strokeStyle = cracked ? '#ff003c' : '#00f0ff';
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        for (let i = 0; i < 6; i++) {
-          const angle = (Math.PI / 3) * i - Math.PI / 6;
-          const hx = cx + 260 * Math.cos(angle);
-          const hy = cy + 260 * Math.sin(angle);
-          if (i === 0) ctx.moveTo(hx, hy);
-          else ctx.lineTo(hx, hy);
-        }
-        ctx.closePath();
-        ctx.stroke();
-        ctx.restore();
-
-        // Titan Crown if Stage 5
-        if (info.stage === 5) {
+        // Draw Equipped Wings on Poster if active
+        if (eq.wings === 'wings_neon') {
+          ctx.fillStyle = 'rgba(252, 238, 10, 0.2)';
           ctx.strokeStyle = '#fcee0a';
-          ctx.lineWidth = 8;
+          ctx.lineWidth = 6;
           ctx.beginPath();
-          ctx.ellipse(cx, cy - 195, 95, 26, 0, 0, Math.PI * 2);
+          ctx.moveTo(cx - 110, cy - 40);
+          ctx.lineTo(cx - 280, cy - 170);
+          ctx.lineTo(cx - 230, cy + 40);
+          ctx.lineTo(cx - 120, cy + 50);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(cx + 110, cy - 40);
+          ctx.lineTo(cx + 280, cy - 170);
+          ctx.lineTo(cx + 230, cy + 40);
+          ctx.lineTo(cx + 120, cy + 50);
+          ctx.closePath();
+          ctx.fill();
           ctx.stroke();
         }
 
-        // Core Geometric Helmet Silhouette
+        // Core Helmet Silhouette
         ctx.fillStyle = '#0b0f19';
         ctx.strokeStyle = accent;
         ctx.lineWidth = 8;
@@ -1564,7 +1979,6 @@
         ctx.fill();
         ctx.stroke();
 
-        // Glowing Visor Eyes
         ctx.fillStyle = accent;
         ctx.beginPath();
         ctx.moveTo(cx - 75, cy - 18);
@@ -1576,43 +1990,26 @@
         ctx.closePath();
         ctx.fill();
 
-        // 5. Big Day Counter & Stats Cards
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffffff';
         ctx.font = '900 84px monospace';
         ctx.fillText(`ДЕНЬ ${day} ИЗ 90`, cx, 1020);
 
-        // Progress Bar (90 Days)
-        const barX = 120;
-        const barY = 1075;
-        const barW = W - 240;
-        const barH = 38;
+        const barX = 120, barY = 1075, barW = W - 240, barH = 38;
         ctx.fillStyle = '#111827';
         ctx.fillRect(barX, barY, barW, barH);
-        ctx.strokeStyle = '#1e293b';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(barX, barY, barW, barH);
-
         const fillW = Math.max(24, Math.round((day / 90) * barW));
-        const pGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
-        pGrad.addColorStop(0, '#00f0ff');
-        pGrad.addColorStop(0.5, '#a855f7');
-        pGrad.addColorStop(1, '#ff003c');
-        ctx.fillStyle = pGrad;
+        ctx.fillStyle = accent;
         ctx.fillRect(barX, barY, fillW, barH);
 
-        // Stat Boxes Row (Streak, Discipline, Coins)
         const boxes = [
           { label: 'УДАРНЫЙ СТРИК', val: `🔥 ${streak} ДН.`, color: '#ff003c' },
           { label: 'ДИСЦИПЛИНА', val: `⚡ ${discipline}%`, color: '#00ff66' },
-          { label: 'СТАТУС ЩИТА', val: cracked ? 'ПРОБИТ' : 'АКТИВЕН', color: cracked ? '#ff003c' : '#00f0ff' }
+          { label: 'ЗАМОРОЗКИ', val: `❄️ ${this.state.streakFreezes}`, color: '#38bdf8' }
         ];
 
         boxes.forEach((b, idx) => {
-          const bx = 96 + idx * 304;
-          const by = 1170;
-          const bw = 280;
-          const bh = 160;
+          const bx = 96 + idx * 304, by = 1170, bw = 280, bh = 160;
           ctx.fillStyle = '#0f121c';
           ctx.fillRect(bx, by, bw, bh);
           ctx.strokeStyle = b.color;
@@ -1629,32 +2026,17 @@
           ctx.fillText(b.val, bx + bw / 2, by + 118);
         });
 
-        // 6. Mini 90-Day Heatmap Drawn on Poster
-        ctx.textAlign = 'left';
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = 'bold 24px monospace';
-        ctx.fillText('МАТРИЦА ТРАНСФОРМАЦИИ (90 ДНЕЙ):', 96, 1410);
-
-        const cols = 15;
-        const cellS = 48;
-        const gap = 12;
-        const startX = 96;
-        const startY = 1440;
-
+        const cols = 15, cellS = 48, gap = 12, startX = 96, startY = 1440;
         for (let i = 1; i <= 90; i++) {
           const r = Math.floor((i - 1) / cols);
           const c = (i - 1) % cols;
           const x = startX + c * (cellS + gap);
           const y = startY + r * (cellS + gap);
-
           const isDone = this.state.completedDays.includes(i) || i < day;
-          const isCurr = i === day;
-
-          ctx.fillStyle = isDone ? '#00f0ff' : isCurr ? '#ff003c' : '#111827';
+          ctx.fillStyle = isDone ? '#00f0ff' : i === day ? '#ff003c' : '#111827';
           ctx.fillRect(x, y, cellS, cellS);
         }
 
-        // Footer Call to Action
         ctx.textAlign = 'center';
         ctx.fillStyle = '#00f0ff';
         ctx.font = 'bold 28px monospace';
@@ -1674,24 +2056,19 @@
       async shareHeroCardImage() {
         Haptics.impact('medium');
         if (!this.lastGeneratedCardDataUrl) return;
-
         try {
           const res = await fetch(this.lastGeneratedCardDataUrl);
           const blob = await res.blob();
           const file = new File([blob], `project90-day-${this.state.day}.png`, { type: 'image/png' });
-
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
               title: 'PROJECT 90 // Карточка Героя',
               text: `Мой прогресс в PROJECT 90: День ${this.state.day}/90, стрик ${this.state.streak}🔥!`,
               files: [file]
             });
-            this.showToast('КАРТОЧКА ОТПРАВЛЕНА!');
             return;
           }
         } catch (e) {}
-
-        // Fallback if Web Share API with files is not supported on desktop/webview
         this.downloadHeroCardImage();
       },
 
@@ -1710,13 +2087,15 @@
       renderAll() {
         document.getElementById('header-streak').textContent = this.state.streak;
         document.getElementById('header-coins').textContent = this.state.coins;
-        document.getElementById('shop-coins').textContent = this.state.coins;
+        document.getElementById('header-freezes').textContent = this.state.streakFreezes;
+        document.getElementById('pro-header-badge').classList.toggle('hidden', !this.state.isPro);
 
         this.renderAvatar();
         this.renderHabits();
         this.renderAntiHabits();
         this.renderClan();
         this.renderStats();
+        this.renderShop();
       },
 
       switchTab(tab) {
@@ -1761,7 +2140,7 @@
           vx: (Math.random() - 0.5) * 0.3,
           vy: -Math.random() * 0.45 - 0.1,
           size: Math.random() * 2 + 0.5,
-          color: Math.random() > 0.25 ? '#00f0ff' : '#a855f7'
+          color: Math.random() > 0.25 ? '#00f0ff' : '#fcee0a'
         }));
 
         function draw() {
