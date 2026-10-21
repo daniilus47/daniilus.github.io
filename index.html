@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PROJECT 90 // PHASE 3 CO-OP</title>
+  <title>PROJECT 90 // PHASE 4 STATS & VIRAL ENGINE</title>
   
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -103,6 +103,8 @@
 <body class="scanlines font-sans antialiased selection:bg-cyber-cyan selection:text-black">
 
   <canvas id="bg-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
+  <!-- Hidden High-Res Canvas for Viral Hero Card Generation (1080x1920 Stories Format) -->
+  <canvas id="viral-card-canvas" width="1080" height="1920" class="hidden"></canvas>
 
   <div id="app-shell" class="relative z-10 max-w-md mx-auto min-h-screen flex flex-col pb-28 px-4 pt-3">
 
@@ -114,7 +116,7 @@
           <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyber-cyan"></span>
         </div>
         <div>
-          <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400">PROJECT 90 // PHASE III</div>
+          <div class="text-[10px] font-mono uppercase tracking-widest text-slate-400">PROJECT 90 // PHASE IV</div>
           <div id="user-callsign" class="text-xs font-bold tracking-wider text-white font-mono">OPERATOR_01</div>
         </div>
       </div>
@@ -237,10 +239,8 @@
         <div id="antihabits-list" class="space-y-3"></div>
       </div>
 
-      <!-- VIEW 3: CLAN (PHASE 3 CO-OP & SQUAD LEADERBOARD) -->
+      <!-- VIEW 3: CLAN (CO-OP & SQUAD LEADERBOARD) -->
       <div id="view-clan" class="hidden space-y-4">
-        
-        <!-- Squad Command Header & Invite Action -->
         <div class="bg-gradient-to-b from-cyber-card to-[#0b0d16] neon-border-purple rounded-2xl p-4 space-y-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2.5">
@@ -258,14 +258,12 @@
             </div>
           </div>
 
-          <!-- Primary Share / Invite Button -->
           <button onclick="App.shareClanInvite()" 
             class="w-full py-3 rounded-xl bg-gradient-to-r from-cyber-purple via-fuchsia-600 to-cyber-cyan text-white font-mono font-black text-xs uppercase tracking-wider shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
             <i data-lucide="share-2" class="w-4 h-4"></i>
             <span>ПРИГЛАСИТЬ В КЛАН / ПОДЕЛИТЬСЯ ФОРМОЙ</span>
           </button>
 
-          <!-- Copy Ref Code / Manual Sync Collapse -->
           <div class="pt-1 flex items-center justify-between gap-2 text-[10px] font-mono text-slate-400">
             <button onclick="App.copyMyRefCode()" class="flex items-center gap-1 text-cyber-cyan hover:underline">
               <i data-lucide="copy" class="w-3 h-3"></i>
@@ -276,7 +274,6 @@
             </button>
           </div>
 
-          <!-- Manual Ref Code Input Box (For Browser Testing or Direct Sync) -->
           <div id="manual-sync-box" class="hidden pt-2 border-t border-cyber-border/80 flex gap-2">
             <input id="manual-ref-input" type="text" placeholder="Вставь ref_... ссылку или код друга" 
               class="flex-1 bg-slate-900 border border-cyber-border rounded-xl px-3 py-2 text-[11px] text-white placeholder-slate-500 focus:outline-none focus:border-cyber-purple font-mono" />
@@ -286,43 +283,117 @@
           </div>
         </div>
 
-        <!-- SQUAD LEADERBOARD LIST -->
         <div>
           <div class="flex items-center justify-between mb-2">
             <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Рейтинг выживших операторов</span>
             <span id="clan-awake-counter" class="text-[11px] font-mono text-cyber-emerald font-bold">0 В СТРОЮ</span>
           </div>
-
-          <div id="clan-leaderboard" class="space-y-2.5">
-            <!-- Populated by JS -->
-          </div>
+          <div id="clan-leaderboard" class="space-y-2.5"></div>
         </div>
-
       </div>
 
-      <!-- VIEW 4: STATS -->
+      <!-- VIEW 4: STATS (PHASE 4: 90-DAY HEATMAP, RECORD CARDS & VIRAL STORY GENERATOR) -->
       <div id="view-stats" class="hidden space-y-4">
-        <div class="bg-cyber-card border border-cyber-border rounded-2xl p-4 space-y-3">
-          <h2 class="text-sm font-mono font-bold text-white uppercase tracking-wider">Метрики трансформации</h2>
-          <div class="grid grid-cols-2 gap-3 pt-1 font-mono">
-            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">ТЕКУЩИЙ ДЕНЬ</div>
-              <div id="stat-total-days" class="text-lg font-bold text-cyber-cyan">1 / 90</div>
+        
+        <!-- 1. RECORD CARDS (4 METRICS) -->
+        <div class="grid grid-cols-2 gap-2.5 font-mono">
+          <!-- Current Streak -->
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
+              <span>ТЕКУЩИЙ СТРИК</span>
+              <i data-lucide="flame" class="w-3.5 h-3.5 text-cyber-crimson"></i>
             </div>
-            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">ЗАРАБОТАНО ЗА ВСЕ ВРЕМЯ</div>
-              <div id="stat-total-coins" class="text-lg font-bold text-cyber-gold">0 ⚡</div>
+            <div id="stat-card-streak" class="text-xl font-black text-white">0 ДН.</div>
+            <div class="text-[9px] text-cyber-crimson mt-0.5">Ударный режим</div>
+          </div>
+
+          <!-- Best Streak -->
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
+              <span>ЛУЧШИЙ СТРИК</span>
+              <i data-lucide="trophy" class="w-3.5 h-3.5 text-cyber-gold"></i>
             </div>
-            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">СТАТУС ЩИТА</div>
-              <div id="stat-shield-state" class="text-sm font-bold text-cyber-emerald">АКТИВЕН</div>
+            <div id="stat-card-best" class="text-xl font-black text-cyber-gold">0 ДН.</div>
+            <div class="text-[9px] text-slate-400 mt-0.5">Абсолютный рекорд</div>
+          </div>
+
+          <!-- Discipline Level % -->
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
+              <span>ДИСЦИПЛИНА</span>
+              <i data-lucide="activity" class="w-3.5 h-3.5 text-cyber-emerald"></i>
             </div>
-            <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
-              <div class="text-[10px] text-slate-400">БОЙЦОВ В КЛАНЕ</div>
-              <div id="stat-clan-size" class="text-lg font-bold text-cyber-purple">4</div>
+            <div id="stat-card-discipline" class="text-xl font-black text-cyber-emerald">100%</div>
+            <div id="stat-card-discipline-sub" class="text-[9px] text-slate-400 mt-0.5">Индекс стабильности</div>
+          </div>
+
+          <!-- Avatar Stage -->
+          <div class="bg-cyber-card border border-cyber-border rounded-2xl p-3.5 relative overflow-hidden">
+            <div class="flex items-center justify-between text-[10px] text-slate-400 mb-1">
+              <span>СТАДИЯ АВАТАРА</span>
+              <i data-lucide="cpu" class="w-3.5 h-3.5 text-cyber-cyan"></i>
             </div>
+            <div id="stat-card-stage" class="text-base font-black text-cyber-cyan truncate">СПЯЩИЙ</div>
+            <div id="stat-card-stage-sub" class="text-[9px] text-slate-400 mt-0.5">Уровень 1 // День 1/90</div>
           </div>
         </div>
+
+        <!-- 2. 90-DAY NEON HEATMAP MATRIX -->
+        <div class="bg-cyber-card neon-border-cyan rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-[10px] font-mono uppercase tracking-widest text-cyber-cyan">WINTER ARC MATRIX</div>
+              <h2 class="text-sm font-mono font-bold text-white uppercase">СЕТКА 90 ДНЕЙ (HEATMAP)</h2>
+            </div>
+            <div class="text-right font-mono">
+              <div class="text-[10px] text-slate-400">ПРОЙДЕНО</div>
+              <div id="heatmap-percent" class="text-base font-black text-cyber-cyan">0%</div>
+            </div>
+          </div>
+
+          <!-- 90 Cells Grid (10 columns x 9 rows) -->
+          <div id="heatmap-grid" class="grid grid-cols-10 gap-1.5 my-2">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Heatmap Legend -->
+          <div class="flex items-center justify-between text-[9px] font-mono text-slate-400 pt-2.5 mt-2 border-t border-cyber-border">
+            <span class="flex items-center gap-1">
+              <span class="w-2.5 h-2.5 rounded-sm bg-cyber-cyan shadow-[0_0_6px_#00f0ff] inline-block"></span> Закрыт
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2.5 h-2.5 rounded-sm bg-cyber-gold shadow-[0_0_6px_#fcee0a] inline-block"></span> Рубеж (30/60/90)
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2.5 h-2.5 rounded-sm border border-cyber-crimson bg-cyber-crimson/20 inline-block"></span> Сегодня
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="w-2.5 h-2.5 rounded-sm bg-slate-900 border border-slate-800 inline-block"></span> Впереди
+            </span>
+          </div>
+        </div>
+
+        <!-- 3. VIRAL MARKETING FEATURE: SHARE HERO CARD (STORIES / TIKTOK) -->
+        <div class="bg-gradient-to-r from-[#130d24] via-[#0f1322] to-[#0b1b24] neon-border-purple rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-cyber-gold/15 border border-cyber-gold/40 text-cyber-gold font-mono text-[9px] font-bold mb-1">
+                <span>⚡ VIRAL STORY EXPORT // 9:16 HD</span>
+              </div>
+              <h3 class="text-xs font-mono font-black text-white uppercase tracking-wider">КАРТОЧКА ГЕРОЯ ДЛЯ STORIES / TIKTOK</h3>
+              <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
+                Сгенерируй стильный кибер-постер со своим прокачанным Аватаром, стриком и матрицей 90 дней в 1 клик.
+              </p>
+            </div>
+          </div>
+
+          <button onclick="App.generateAndPreviewHeroCard()" 
+            class="w-full py-3.5 rounded-xl bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-crimson text-white font-mono font-black text-xs uppercase tracking-widest shadow-lg shadow-cyber-purple/25 flex items-center justify-center gap-2 active:scale-98 transition">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>ПОДЕЛИТЬСЯ КАРТОЧКОЙ ГЕРОЯ</span>
+          </button>
+        </div>
+
       </div>
 
       <!-- VIEW 5: SHOP -->
@@ -388,10 +459,9 @@
 
   </div>
 
-  <!-- MODAL: SMART HABIT GENERATOR & CATALOG -->
+  <!-- MODAL 1: SMART HABIT GENERATOR & CATALOG -->
   <div id="habit-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4">
     <div class="w-full max-w-md bg-cyber-card border-t sm:border border-cyber-cyan/40 rounded-t-3xl sm:rounded-2xl p-5 max-h-[85vh] flex flex-col shadow-2xl">
-      
       <div class="flex items-center justify-between pb-3 border-b border-cyber-border">
         <div class="flex items-center gap-2">
           <i data-lucide="cpu" class="w-4 h-4 text-cyber-cyan"></i>
@@ -424,7 +494,38 @@
           </button>
         </div>
       </div>
+    </div>
+  </div>
 
+  <!-- MODAL 2: VIRAL HERO CARD PREVIEW & SHARE/DOWNLOAD -->
+  <div id="viral-card-modal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-cyber-card neon-border-cyan rounded-2xl p-4 flex flex-col items-center shadow-2xl max-h-[92vh]">
+      <div class="w-full flex items-center justify-between pb-2.5 mb-2 border-b border-cyber-border">
+        <span class="text-xs font-mono font-bold text-cyber-cyan uppercase tracking-wider">КАРТОЧКА ГЕРОЯ // STORIES 9:16</span>
+        <button onclick="App.closeViralModal()" class="text-slate-400 hover:text-white font-mono text-sm px-2">✕</button>
+      </div>
+
+      <!-- Generated Image Preview -->
+      <div class="w-full flex-1 overflow-hidden flex items-center justify-center my-1">
+        <img id="viral-card-preview" alt="PROJECT 90 Hero Card" class="max-h-[60vh] w-auto rounded-xl border border-cyber-border shadow-xl object-contain" />
+      </div>
+
+      <p class="text-[10px] font-mono text-slate-400 text-center my-2">
+        Поделись напрямую в Stories / ТГ или сохрани PNG в галерею
+      </p>
+
+      <div class="w-full grid grid-cols-2 gap-2.5">
+        <button onclick="App.shareHeroCardImage()" 
+          class="py-3 rounded-xl bg-gradient-to-r from-cyber-cyan to-blue-600 text-black font-mono font-black text-xs uppercase tracking-wider active:scale-95 transition flex items-center justify-center gap-1.5">
+          <i data-lucide="send" class="w-4 h-4"></i>
+          <span>ПОДЕЛИТЬСЯ</span>
+        </button>
+        <button onclick="App.downloadHeroCardImage()" 
+          class="py-3 rounded-xl bg-slate-900 border border-cyber-cyan/50 text-cyber-cyan font-mono font-bold text-xs uppercase tracking-wider active:scale-95 transition flex items-center justify-center gap-1.5">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>СКАЧАТЬ PNG</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -437,7 +538,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'PROJECT_90_PHASE3_STATE';
+    const STORAGE_KEY = 'PROJECT_90_PHASE4_STATE';
     const tg = window.Telegram?.WebApp;
 
     const HABIT_CATALOG = {
@@ -523,6 +624,8 @@
       callsign: 'OPERATOR_01',
       day: 1,
       streak: 0,
+      bestStreak: 0,
+      completedDays: [],
       coins: 20,
       totalCoinsEarned: 20,
       totalSlips: 0,
@@ -542,7 +645,7 @@
         { id: 'ah_sugar', title: 'Без рафинированного сахара', startTime: nowMs - 5 * 86400000 - 3600000, bestSeconds: 5 * 86400 + 3600, slips: 0 }
       ],
       clanMembers: [
-        { id: ' peer_vanguard', name: 'KIRA_NEXUS', day: 34, streak: 19, doneToday: true },
+        { id: 'peer_vanguard', name: 'KIRA_NEXUS', day: 34, streak: 19, doneToday: true },
         { id: 'peer_monk', name: 'GHOST_77', day: 64, streak: 42, doneToday: true },
         { id: 'peer_sleeper', name: 'DEN_ZERO', day: 9, streak: 2, doneToday: false }
       ],
@@ -553,6 +656,7 @@
       state: JSON.parse(JSON.stringify(DEFAULT_STATE)),
       currentCatalogCat: 'str',
       liveTimerInterval: null,
+      lastGeneratedCardDataUrl: null,
 
       async init() {
         if (tg) {
@@ -563,12 +667,19 @@
 
         await this.loadState();
 
-        // Sync callsign from Telegram user profile if available
         const tgUser = tg?.initDataUnsafe?.user;
         if (tgUser) {
           this.state.callsign = (tgUser.username || tgUser.first_name || 'OPERATOR').toUpperCase();
         }
         document.getElementById('user-callsign').textContent = this.state.callsign;
+
+        // Ensure bestStreak is never lower than current streak
+        if ((this.state.streak || 0) > (this.state.bestStreak || 0)) {
+          this.state.bestStreak = this.state.streak;
+        }
+        if (!Array.isArray(this.state.completedDays)) {
+          this.state.completedDays = [];
+        }
 
         this.checkRollover();
         this.checkIncomingReferral();
@@ -582,7 +693,6 @@
         return new Date().toISOString().slice(0, 10);
       },
 
-      // Calculate stage 1..5 from challenge day
       getStageInfo(day) {
         if (day >= 90) return { stage: 5, title: 'ТИТАН', primary: '#fcee0a', secondary: '#ff003c' };
         if (day >= 61) return { stage: 4, title: 'МОНАХ', primary: '#ff003c', secondary: '#00f0ff' };
@@ -591,7 +701,17 @@
         return { stage: 1, title: 'СПЯЩИЙ', primary: '#64748b', secondary: '#1e293b' };
       },
 
-      // Mini SVG Avatar Generator for Squad Leaderboard
+      // Calculate overall Discipline Rating (0..100%)
+      getDisciplineScore() {
+        const totalHabits = this.state.habits.length || 1;
+        const doneHabits = this.state.habits.filter(h => h.done).length;
+        const todayRatio = doneHabits / totalHabits;
+        const shieldBonus = this.state.shieldCracked ? 0 : 25;
+        const streakBonus = Math.min(25, (this.state.streak || 0) * 3);
+        const raw = Math.round((todayRatio * 50) + shieldBonus + streakBonus);
+        return Math.max(10, Math.min(100, raw));
+      },
+
       getMiniAvatarSVG(day) {
         const info = this.getStageInfo(day);
         return `
@@ -605,7 +725,6 @@
         `;
       },
 
-      // P2P Serverless Referral Encoder: packs user profile into ref_<Base64URL>
       generateMyRefToken() {
         const anyDoneToday = this.state.habits.some(h => h.done) || this.state.lastCompletedDate === this.getTodayISO();
         const payload = {
@@ -622,7 +741,6 @@
         return `ref_${b64}`;
       },
 
-      // Decode ref_<Base64URL> token and add/update friend in clanMembers
       processRefToken(rawToken) {
         if (!rawToken) return false;
         let token = rawToken.trim();
@@ -698,8 +816,7 @@
       },
 
       toggleManualSyncBox() {
-        const box = document.getElementById('manual-sync-box');
-        box.classList.toggle('hidden');
+        document.getElementById('manual-sync-box').classList.toggle('hidden');
       },
 
       importManualRef() {
@@ -714,14 +831,13 @@
         }
       },
 
-      // Nudge ("Пнуть друга") via Telegram native share dialog
-      nudgeFriend(friendName, friendStage) {
+      nudgeFriend(friendName) {
         SoundFX.play('nudge');
         Haptics.impact('heavy');
         const myInfo = this.getStageInfo(this.state.day);
         const refToken = this.generateMyRefToken();
         const botUrl = `https://t.me/Project90WinterArcBot?startapp=${refToken}`;
-        const text = `⚡ Йо, ${friendName}! Мой аватар уже на ${myInfo.stage} уровне («${myInfo.title}», стрик ${this.state.streak}🔥), а ты еще не закрыл задачи за сегодня! Не сливай стрик клана!`;
+        const text = `⚡ Йо, ${friendName}! Мой аватар уже на ${myInfo.stage} уровне («${myInfo.title}», стрик ${this.state.streak}🔥), а ты еще не закрыл задачи за сегодня! Не сливай стрик!`;
         const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(botUrl)}&text=${encodeURIComponent(text)}`;
 
         if (tg?.openTelegramLink) {
@@ -1028,7 +1144,14 @@
           return;
         }
 
+        if (!this.state.completedDays.includes(this.state.day)) {
+          this.state.completedDays.push(this.state.day);
+        }
+
         this.state.streak += 1;
+        if (this.state.streak > (this.state.bestStreak || 0)) {
+          this.state.bestStreak = this.state.streak;
+        }
         if (this.state.day < 90) this.state.day += 1;
         this.state.lastCompletedDate = today;
         this.state.coins += 30;
@@ -1196,7 +1319,6 @@
         }).join('');
       },
 
-      // Render Squad Leaderboard with Mini-Avatars, Streak & Nudge Button
       renderClan() {
         const myDoneToday = this.state.habits.some(h => h.done) || this.state.lastCompletedDate === this.getTodayISO();
         const meEntry = {
@@ -1218,7 +1340,6 @@
 
         document.getElementById('clan-total-streak').textContent = `${totalStreak} 🔥`;
         document.getElementById('clan-awake-counter').textContent = `${awakeCount}/${combined.length} ВЫПОЛНИЛИ СЕГОДНЯ`;
-        document.getElementById('stat-clan-size').textContent = combined.length;
 
         const board = document.getElementById('clan-leaderboard');
         board.innerHTML = combined.map((member, index) => {
@@ -1233,10 +1354,7 @@
             }">
               <div class="flex items-center gap-2.5 min-w-0">
                 <div class="text-xs font-mono font-bold text-slate-400 w-5 text-center">${rankBadge}</div>
-                
-                <!-- Mini Dynamic SVG Avatar -->
                 ${this.getMiniAvatarSVG(member.day)}
-
                 <div class="min-w-0">
                   <div class="flex items-center gap-1.5">
                     <span class="text-xs font-mono font-bold text-white truncate">${member.name}</span>
@@ -1244,12 +1362,9 @@
                       🔥 ${member.streak}д
                     </span>
                   </div>
-
                   <div class="text-[10px] font-mono text-slate-400 mt-0.5">
                     Ур.${info.stage} ${info.title} • День ${member.day}/90
                   </div>
-
-                  <!-- Status Today Badge -->
                   <div class="mt-1">
                     ${member.doneToday ? `
                       <span class="inline-flex items-center gap-1 text-[9px] font-mono font-bold text-cyber-emerald bg-cyber-emerald/10 border border-cyber-emerald/30 px-1.5 py-0.5 rounded">
@@ -1263,10 +1378,8 @@
                   </div>
                 </div>
               </div>
-
-              <!-- NUDGE ("ПНУТЬ") BUTTON FOR FRIENDS -->
               ${!member.isMe ? `
-                <button onclick="App.nudgeFriend('${member.name}', ${info.stage})" 
+                <button onclick="App.nudgeFriend('${member.name}')" 
                   class="shrink-0 px-2.5 py-2 rounded-xl font-mono text-[10px] font-black uppercase tracking-wider transition active:scale-95 ${
                     member.doneToday 
                       ? 'bg-slate-900 border border-slate-700 text-slate-300 hover:border-cyber-cyan hover:text-cyber-cyan' 
@@ -1280,19 +1393,330 @@
         }).join('');
       },
 
+      // PHASE 4: Render Stats Tab (4 Record Cards + 90-Day Neon Heatmap)
+      renderStats() {
+        const day = this.state.day;
+        const streak = this.state.streak || 0;
+        const best = Math.max(streak, this.state.bestStreak || 0);
+        const discipline = this.getDisciplineScore();
+        const info = this.getStageInfo(day);
+
+        document.getElementById('stat-card-streak').textContent = `${streak} ДН.`;
+        document.getElementById('stat-card-best').textContent = `${best} ДН.`;
+        document.getElementById('stat-card-discipline').textContent = `${discipline}%`;
+        document.getElementById('stat-card-discipline-sub').textContent = this.state.shieldCracked ? 'Щит поврежден (-25%)' : 'Щит в норме (+25%)';
+        document.getElementById('stat-card-stage').textContent = info.title;
+        document.getElementById('stat-card-stage-sub').textContent = `Уровень ${info.stage} // День ${day}/90`;
+
+        // Render 90-Day Heatmap Grid
+        const grid = document.getElementById('heatmap-grid');
+        let html = '';
+        let closedCount = 0;
+
+        for (let i = 1; i <= 90; i++) {
+          const isCompleted = this.state.completedDays.includes(i) || i < day;
+          const isCurrent = i === day;
+          const isMilestone = i === 30 || i === 60 || i === 90;
+
+          if (isCompleted) closedCount++;
+
+          let cellStyle = 'bg-slate-900/90 border border-slate-800 text-slate-500';
+          if (isCompleted && isMilestone) {
+            cellStyle = 'bg-cyber-gold text-black font-black shadow-[0_0_10px_rgba(252,238,10,0.75)] border border-cyber-gold';
+          } else if (isCompleted) {
+            cellStyle = 'bg-cyber-cyan text-black font-black shadow-[0_0_8px_rgba(0,240,255,0.55)] border border-cyber-cyan';
+          } else if (isCurrent) {
+            cellStyle = 'bg-cyber-crimson/25 border border-cyber-crimson text-white font-bold animate-pulse';
+          } else if (isMilestone) {
+            cellStyle = 'bg-slate-900 border border-cyber-gold/40 text-cyber-gold/70';
+          }
+
+          html += `
+            <div onclick="App.inspectHeatmapDay(${i})" 
+              class="aspect-square rounded-md flex items-center justify-center text-[10px] font-mono cursor-pointer active:scale-90 transition ${cellStyle}">
+              ${i}
+            </div>
+          `;
+        }
+        grid.innerHTML = html;
+
+        const pct = Math.round((closedCount / 90) * 100);
+        document.getElementById('heatmap-percent').textContent = `${pct}% (${closedCount}/90)`;
+      },
+
+      inspectHeatmapDay(dayNum) {
+        Haptics.impact('light');
+        const isDone = this.state.completedDays.includes(dayNum) || dayNum < this.state.day;
+        if (isDone) {
+          this.showToast(`ДЕНЬ ${dayNum}/90 // ПРОТОКОЛ ВЫПОЛНЕН ✓`);
+        } else if (dayNum === this.state.day) {
+          this.showToast(`ДЕНЬ ${dayNum}/90 // ТЕКУЩИЙ БОЕВОЙ ДЕНЬ`);
+        } else {
+          this.showToast(`ДЕНЬ ${dayNum}/90 // ОЖИДАЕТ ТРАНСФОРМАЦИИ`);
+        }
+      },
+
+      // PHASE 4 VIRAL FEATURE: High-Res 1080x1920 Stories Poster Generator on Hidden Canvas
+      generateAndPreviewHeroCard() {
+        Haptics.impact('heavy');
+        SoundFX.play('coin');
+
+        const canvas = document.getElementById('viral-card-canvas');
+        const ctx = canvas.getContext('2d');
+        const W = 1080;
+        const H = 1920;
+
+        const day = this.state.day;
+        const streak = this.state.streak || 0;
+        const discipline = this.getDisciplineScore();
+        const info = this.getStageInfo(day);
+        const cracked = this.state.shieldCracked;
+        const accent = cracked ? '#ff003c' : info.primary;
+
+        // 1. Deep Cyberpunk Background Gradient
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#05060a');
+        bgGrad.addColorStop(0.5, '#0c101d');
+        bgGrad.addColorStop(1, '#06070b');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // 2. Subtle Perspective Cyber Grid
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.06)';
+        ctx.lineWidth = 2;
+        for (let x = 0; x <= W; x += 90) {
+          ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+        }
+        for (let y = 0; y <= H; y += 90) {
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+
+        // 3. Outer Neon Frame
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 5;
+        ctx.strokeRect(48, 48, W - 96, H - 96);
+
+        // Top System Header
+        ctx.fillStyle = '#00f0ff';
+        ctx.font = 'bold 34px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText('PROJECT 90 // WINTER ARC SYSTEM', 96, 130);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '26px monospace';
+        ctx.fillText(`OPERATOR: ${this.state.callsign}`, 96, 175);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fcee0a';
+        ctx.font = 'bold 34px monospace';
+        ctx.fillText(`LVL ${info.stage} // ${info.title}`, W - 96, 130);
+
+        // 4. Central Glowing Avatar & Aura (Center X: 540, Y: 620)
+        const cx = 540;
+        const cy = 620;
+
+        const radGrad = ctx.createRadialGradient(cx, cy, 40, cx, cy, 330);
+        radGrad.addColorStop(0, accent);
+        radGrad.addColorStop(0.5, 'rgba(0, 240, 255, 0.12)');
+        radGrad.addColorStop(1, 'rgba(7, 8, 12, 0)');
+        ctx.fillStyle = radGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 330, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Outer Hex Shield on Canvas
+        ctx.save();
+        ctx.strokeStyle = cracked ? '#ff003c' : '#00f0ff';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 3) * i - Math.PI / 6;
+          const hx = cx + 260 * Math.cos(angle);
+          const hy = cy + 260 * Math.sin(angle);
+          if (i === 0) ctx.moveTo(hx, hy);
+          else ctx.lineTo(hx, hy);
+        }
+        ctx.closePath();
+        ctx.stroke();
+        ctx.restore();
+
+        // Titan Crown if Stage 5
+        if (info.stage === 5) {
+          ctx.strokeStyle = '#fcee0a';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.ellipse(cx, cy - 195, 95, 26, 0, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Core Geometric Helmet Silhouette
+        ctx.fillStyle = '#0b0f19';
+        ctx.strokeStyle = accent;
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 150);
+        ctx.lineTo(cx + 115, cy - 65);
+        ctx.lineTo(cx + 90, cy + 95);
+        ctx.lineTo(cx, cy + 165);
+        ctx.lineTo(cx - 90, cy + 95);
+        ctx.lineTo(cx - 115, cy - 65);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Glowing Visor Eyes
+        ctx.fillStyle = accent;
+        ctx.beginPath();
+        ctx.moveTo(cx - 75, cy - 18);
+        ctx.lineTo(cx, cy + 8);
+        ctx.lineTo(cx + 75, cy - 18);
+        ctx.lineTo(cx + 55, cy + 22);
+        ctx.lineTo(cx, cy + 36);
+        ctx.lineTo(cx - 55, cy + 22);
+        ctx.closePath();
+        ctx.fill();
+
+        // 5. Big Day Counter & Stats Cards
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 84px monospace';
+        ctx.fillText(`ДЕНЬ ${day} ИЗ 90`, cx, 1020);
+
+        // Progress Bar (90 Days)
+        const barX = 120;
+        const barY = 1075;
+        const barW = W - 240;
+        const barH = 38;
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(barX, barY, barW, barH);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        const fillW = Math.max(24, Math.round((day / 90) * barW));
+        const pGrad = ctx.createLinearGradient(barX, 0, barX + barW, 0);
+        pGrad.addColorStop(0, '#00f0ff');
+        pGrad.addColorStop(0.5, '#a855f7');
+        pGrad.addColorStop(1, '#ff003c');
+        ctx.fillStyle = pGrad;
+        ctx.fillRect(barX, barY, fillW, barH);
+
+        // Stat Boxes Row (Streak, Discipline, Coins)
+        const boxes = [
+          { label: 'УДАРНЫЙ СТРИК', val: `🔥 ${streak} ДН.`, color: '#ff003c' },
+          { label: 'ДИСЦИПЛИНА', val: `⚡ ${discipline}%`, color: '#00ff66' },
+          { label: 'СТАТУС ЩИТА', val: cracked ? 'ПРОБИТ' : 'АКТИВЕН', color: cracked ? '#ff003c' : '#00f0ff' }
+        ];
+
+        boxes.forEach((b, idx) => {
+          const bx = 96 + idx * 304;
+          const by = 1170;
+          const bw = 280;
+          const bh = 160;
+          ctx.fillStyle = '#0f121c';
+          ctx.fillRect(bx, by, bw, bh);
+          ctx.strokeStyle = b.color;
+          ctx.lineWidth = 3;
+          ctx.strokeRect(bx, by, bw, bh);
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = 'bold 22px monospace';
+          ctx.fillText(b.label, bx + bw / 2, by + 55);
+
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '900 40px monospace';
+          ctx.fillText(b.val, bx + bw / 2, by + 118);
+        });
+
+        // 6. Mini 90-Day Heatmap Drawn on Poster
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 24px monospace';
+        ctx.fillText('МАТРИЦА ТРАНСФОРМАЦИИ (90 ДНЕЙ):', 96, 1410);
+
+        const cols = 15;
+        const cellS = 48;
+        const gap = 12;
+        const startX = 96;
+        const startY = 1440;
+
+        for (let i = 1; i <= 90; i++) {
+          const r = Math.floor((i - 1) / cols);
+          const c = (i - 1) % cols;
+          const x = startX + c * (cellS + gap);
+          const y = startY + r * (cellS + gap);
+
+          const isDone = this.state.completedDays.includes(i) || i < day;
+          const isCurr = i === day;
+
+          ctx.fillStyle = isDone ? '#00f0ff' : isCurr ? '#ff003c' : '#111827';
+          ctx.fillRect(x, y, cellS, cellS);
+        }
+
+        // Footer Call to Action
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#00f0ff';
+        ctx.font = 'bold 28px monospace';
+        ctx.fillText('T.ME/PROJECT90WINTERARCBOT // ПРИСОЕДИНЯЙСЯ К КЛАНУ', cx, 1840);
+
+        this.lastGeneratedCardDataUrl = canvas.toDataURL('image/png');
+        document.getElementById('viral-card-preview').src = this.lastGeneratedCardDataUrl;
+        document.getElementById('viral-card-modal').classList.remove('hidden');
+        lucide.createIcons();
+      },
+
+      closeViralModal() {
+        Haptics.impact('light');
+        document.getElementById('viral-card-modal').classList.add('hidden');
+      },
+
+      async shareHeroCardImage() {
+        Haptics.impact('medium');
+        if (!this.lastGeneratedCardDataUrl) return;
+
+        try {
+          const res = await fetch(this.lastGeneratedCardDataUrl);
+          const blob = await res.blob();
+          const file = new File([blob], `project90-day-${this.state.day}.png`, { type: 'image/png' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: 'PROJECT 90 // Карточка Героя',
+              text: `Мой прогресс в PROJECT 90: День ${this.state.day}/90, стрик ${this.state.streak}🔥!`,
+              files: [file]
+            });
+            this.showToast('КАРТОЧКА ОТПРАВЛЕНА!');
+            return;
+          }
+        } catch (e) {}
+
+        // Fallback if Web Share API with files is not supported on desktop/webview
+        this.downloadHeroCardImage();
+      },
+
+      downloadHeroCardImage() {
+        Haptics.impact('medium');
+        if (!this.lastGeneratedCardDataUrl) return;
+        const a = document.createElement('a');
+        a.href = this.lastGeneratedCardDataUrl;
+        a.download = `PROJECT90_HERO_DAY_${this.state.day}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        this.showToast('КАРТОЧКА СОХРАНЕНА В PNG ✓');
+      },
+
       renderAll() {
         document.getElementById('header-streak').textContent = this.state.streak;
         document.getElementById('header-coins').textContent = this.state.coins;
         document.getElementById('shop-coins').textContent = this.state.coins;
-        document.getElementById('stat-total-days').textContent = `${this.state.day} / 90`;
-        document.getElementById('stat-total-coins').textContent = `${this.state.totalCoinsEarned} ⚡`;
-        document.getElementById('stat-shield-state').textContent = this.state.shieldCracked ? 'ПОВРЕЖДЕН' : 'АКТИВЕН';
-        document.getElementById('stat-shield-state').className = `text-sm font-bold ${this.state.shieldCracked ? 'text-cyber-crimson' : 'text-cyber-emerald'}`;
 
         this.renderAvatar();
         this.renderHabits();
         this.renderAntiHabits();
         this.renderClan();
+        this.renderStats();
       },
 
       switchTab(tab) {
